@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SportAnatomy · Muscle map</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,500;0,700;1,800&family=Noto+Sans+Arabic:wght@500;700&family=Mako&display=swap">
+<style>
+:root{--page:#0d0d0e;--card:#171718;--line:#2a2a2d;--text:#ededee;--mute:#8d8d93;--pri:#e8372f;--sec:#fda36a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--page:#e6e4e1}}
+:root[data-theme="light"]{--page:#e6e4e1}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--page);color:var(--text);font:500 15px/1.4 Saira,"Noto Sans Arabic","Arial Narrow",system-ui,sans-serif;display:flex;justify-content:center;padding:20px 12px}
+.card{width:100%;max-width:760px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 20px 18px}
+h1{margin:0 0 14px;font:italic 800 24px/1.1 Saira,sans-serif;text-transform:uppercase;letter-spacing:.01em}
+.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;background:#0f0f10;border:1px solid var(--line);border-radius:8px;padding:3px}
+.seg button{all:unset;cursor:pointer;padding:8px 16px;border-radius:6px;font-weight:700;color:var(--mute)}
+.seg button[aria-pressed=true]{background:var(--pri);color:#fff}
+.seg button:focus-visible,.chips button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.legend{display:flex;gap:16px;color:var(--mute);font-weight:700;font-size:14px}
+.legend i{display:inline-block;width:14px;height:12px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+.chips button{all:unset;cursor:pointer;padding:6px 12px;border:1px solid var(--line);border-radius:999px;color:var(--mute);font-weight:700;font-size:14px}
+.chips button[aria-pressed=true]{color:var(--text);border-color:#5a5a60;background:#242427}
+svg{display:block;width:100%;height:auto;max-height:78vh;margin:0 auto;overflow:hidden}
+.layout{display:grid;grid-template-columns:240px 1fr;gap:16px;margin-top:14px;align-items:start}
+.stage{min-width:0;position:relative}
+.zr{position:absolute;top:6px;right:6px;z-index:2;cursor:pointer;background:#242427;color:var(--text);border:1px solid #4a4a50;border-radius:6px;padding:5px 10px;font:700 13px Saira,sans-serif}
+.zr[hidden]{display:none}
+.dt{opacity:0;pointer-events:none;transition:opacity .45s .35s}
+.dt.on{opacity:1}
+.dt path{stroke:rgba(255,255,255,.4);stroke-width:.7;fill:none;stroke-linecap:round}
+.dt .ld{stroke:#fff;stroke-width:.45;opacity:.85}
+.dt text{font:700 6.5px Saira,'Noto Sans Arabic',sans-serif;fill:#fff;paint-order:stroke;stroke:#000;stroke-width:1.8px;stroke-linejoin:round}
+@media (max-width:640px){.layout{grid-template-columns:132px 1fr;gap:8px}.layout .info{padding:10px;font-size:13px;min-height:120px}.layout .info b{font-size:16px}.card{padding:14px 10px}}
+.base{fill:#19191b;stroke:#303035;stroke-width:1.5}
+.guide{stroke:#55555b;stroke-width:1;stroke-dasharray:2 3;fill:none}
+.mb{fill:url(#gn);stroke:#0b0b0c;stroke-width:1.3;stroke-linejoin:round;transition:fill .2s}
+.mf{pointer-events:none;opacity:.9}
+.m{cursor:pointer;outline:none}
+.m:hover .mb{filter:brightness(1.3)}
+.m.p .mb{fill:url(#gp)} .m.s .mb{fill:url(#gs)}
+.m[data-m=tendon] .mb{fill:url(#gt)}
+.m[data-m=tendon] .mf{opacity:.3}
+.m[data-m=tendon] .mb{stroke-width:.5}
+.m.p{filter:drop-shadow(0 0 5px rgba(232,55,47,.55))}
+.m.s{filter:drop-shadow(0 0 4px rgba(253,163,106,.35))}
+.m.sel .mb,.m:focus-visible .mb{stroke:#fff;stroke-width:1.8}
+.lbl{display:flex;justify-content:space-around;color:var(--mute);font-weight:700;letter-spacing:.12em;font-size:13px;margin-top:2px}
+.info{position:sticky;top:12px;padding:16px;border:1px solid var(--line);border-left:3px solid var(--pri);border-radius:8px;background:#121213;min-height:150px}
+.info b{font-size:20px;display:block;font-style:italic}
+.info>*{opacity:0;animation:li .4s ease forwards;animation-delay:calc(var(--i,0)*110ms)}
+@keyframes li{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.info .sm{color:var(--text);margin:3px 0 0}
+.info small{display:block;color:var(--mute);font-weight:500;font-size:12px}
+.lg{order:2;cursor:pointer;background:#242427;color:var(--text);border:1px solid #4a4a50;border-radius:8px;padding:8px 14px;font:700 14px Saira,'Noto Sans Arabic',sans-serif}
+:root[lang=ar] h1,:root[lang=ar] .info b{font-style:normal;text-transform:none}
+.bn .mb{fill:url(#gb);stroke:#4a3e28;stroke-width:.7}
+.bn .cart{fill:#e3cfd2}
+.disc{fill:#c9bb9a;stroke:#4a3e28;stroke-width:.4}
+.dl{fill:none;stroke:#5e5238;stroke-width:.6;opacity:.65;pointer-events:none;stroke-linecap:round}
+.hl{fill:none;stroke:#fffaf0;stroke-width:.8;opacity:.6;pointer-events:none;stroke-linecap:round}
+.tooth{fill:#f7f5ec;stroke:#8d8470;stroke-width:.4;pointer-events:none}
+.sock{fill:#15151a;pointer-events:none}
+.lg svg{display:block}
+.by{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));font:400 15px 'Mako Kaiju','Mako',sans-serif;color:var(--mute);letter-spacing:.04em;pointer-events:none;z-index:5}
+.bk{fill:none;stroke:#2c2c31;stroke-width:3.4;stroke-linecap:round;pointer-events:none}
+.sct{font:700 9px Saira,'Noto Sans Arabic',sans-serif;fill:#8d8d93;text-anchor:middle;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}
+.lg[aria-pressed=true]{background:var(--pri);border-color:var(--pri);color:#fff}
+:root[lang=ar] .info{direction:rtl;text-align:right;border-left:1px solid var(--line);border-right:3px solid var(--pri)}
+.info{max-height:calc(100vh - 24px);overflow:auto}
+.tag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:4px;font-size:12px;font-weight:700;color:#111}
+.info p{margin:4px 0 0;color:var(--mute)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}.info>*{animation:none!important;opacity:1!important}}
+</style>
+</head>
+<body>
+<main class="card">
+  <h1 id="title">Muscle map</h1>
+  <div class="bar">
+    <div style="order:2;display:flex;gap:8px"><button class="lg" id="sk" aria-label="Skeleton" aria-pressed="false"><svg viewBox='0 0 24 24' width='22' height='22' fill='currentColor'><path d='M12 2C7 2 3.5 5.6 3.5 10c0 2.6 1.2 4.6 3 5.8V20h3v-2h1v2h2v-2h1v2h3v-4.2c1.8-1.2 3-3.2 3-5.8C20.5 5.6 17 2 12 2zM8.5 12.5a2 2 0 110-4 2 2 0 010 4zm7 0a2 2 0 110-4 2 2 0 010 4zM12 14l-1.2 2h2.4z'/></svg></button><button class="lg" id="lang">AR</button></div>
+    <div class="seg" role="group" aria-label="View">
+      <button data-v="f" aria-pressed="false">Front</button>
+      <button data-v="b" aria-pressed="false">Back</button>
+      <button data-v="both" aria-pressed="true">Both</button>
+    </div>
+    
+  </div>
+  <div class="legend" style="margin-top:12px"><span><i style="background:var(--pri)"></i>Primary</span><span><i style="background:var(--sec)"></i>Secondary</span></div>
+  <div class="layout"><aside class="info" id="info" aria-live="polite"></aside><div class="stage"><button class="zr" id="zr" hidden>Reset view</button>
+  <svg id="fig" viewBox="0 0 800 740" role="img" aria-label="Muscle map, front and back">
+    <defs>
+      <radialGradient id="gn" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#707076"/><stop offset=".55" stop-color="#45454c"/><stop offset="1" stop-color="#242429"/></radialGradient>
+      <radialGradient id="gp" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ff7466"/><stop offset=".55" stop-color="#e0352c"/><stop offset="1" stop-color="#7d0d09"/></radialGradient>
+      <radialGradient id="gs" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ffcb9c"/><stop offset=".55" stop-color="#fd9a55"/><stop offset="1" stop-color="#a84a0c"/></radialGradient>
+    </defs>
+    <g id="views"></g><g id="skel" style="display:none"></g>
+  </svg>
+  <div class="lbl"><span>FRONT</span><span>BACK</span></div>
+  </div></div>
+</main>
+<footer class="by">made by Tito</footer>
+<script>
+/* ---------- muscle data (left half only; the right half is mirrored) ---------- */
+const forearm='M82,308 C74,330 70,360 66,392 L82,394 C90,370 98,340 104,310 Z';
+const absRows=[214,240,266,292].map(y=>`M185,${y+2}Q192,${y-1} 199,${y+2}V${y+22}Q192,${y+25} 185,${y+22}Z`);
+const serr=[0,16,32].map(o=>`M138,${210+o}L150,${214+o}L147,${226+o}L136,${222+o}Z`);
+const FRONT=[ // [id, fibre angle, paths]
+ ['quads',80,['M133,372 C124,410 126,462 140,512 L156,508 C158,462 160,420 156,368 Z','M168,350 C158,380 155,440 160,502 L176,502 C182,440 180,380 168,350 Z','M180,440 C177,470 177,496 181,514 L197,510 C199,482 195,456 187,436 Z']],
+ ['adductors',70,['M180,356 L198,352 C199,392 196,422 187,438 C183,412 181,384 180,356 Z']],
+ ['calves',85,['M144,550 C138,590 140,632 148,670 L164,670 C169,632 169,590 165,550 Z','M131,552 C124,584 128,618 139,642 L146,632 C142,602 140,578 142,554 Z','M170,556 C176,590 176,620 170,652 L164,640 C166,610 166,584 166,560 Z']],
+ ['forearms',75,[forearm,'M98,312 C94,340 90,368 84,394 L96,392 C104,366 110,338 108,314 Z']],
+ ['triceps',85,['M83,238 C77,262 77,288 82,306 L89,306 C87,284 89,258 93,238 Z']],
+ ['biceps',88,['M96,224 C86,242 82,272 87,302 L105,302 C109,276 108,246 102,226 Z']],
+ ['obliques',55,['M180,216 C164,224 150,236 146,262 C144,288 152,312 168,326 L180,316 C174,292 174,262 180,240 Z',...serr]],
+ ['abs',90,absRows],
+ ['chest',20,['M199,142 C180,137 152,141 135,156 C126,172 128,196 142,206 C160,214 184,210 199,200 Z']],
+ ['delt-f',80,['M135,156 C120,143 98,150 92,170 C88,190 92,208 100,224 C112,216 128,202 140,190 C130,180 128,166 135,156 Z']],
+ ['traps',70,['M199,110 L188,112 C176,118 160,126 140,134 C148,144 162,144 178,141 C190,138 197,132 199,124 Z']]
+];
+const BACK=[
+ ['hams',88,['M138,408 C128,446 130,492 142,524 L162,522 C164,486 164,444 160,414 Z','M165,416 C167,446 167,486 165,522 L192,520 C198,486 198,446 196,418 Z']],
+ ['calves',85,['M167,548 C159,574 159,602 169,634 L193,632 C199,602 197,570 189,548 Z','M136,552 C128,578 128,606 142,632 L164,634 C160,602 162,574 164,554 Z','M149,638 C147,652 149,666 155,678 L181,678 C185,664 185,650 183,636 Z']],
+ ['forearms',75,[forearm]],
+ ['triceps',85,['M95,224 C84,244 80,276 86,304 L106,304 C110,276 108,246 101,226 Z','M92,250 C90,272 92,290 96,302']],
+ ['glutes',30,['M199,338 C170,326 140,340 136,376 C134,404 160,420 186,412 L199,404 Z']],
+ ['lats',40,['M148,200 C134,230 130,270 138,308 C150,322 172,324 188,314 L186,290 C190,270 196,258 199,250 C176,232 160,218 148,200 Z','M142,180 C132,198 122,214 114,228 L134,234 C148,216 154,198 152,182 Z']],
+ ['lowback',90,['M186,256 L198,256 L198,332 L180,332 C177,300 181,276 186,256 Z']],
+ ['delt-r',80,['M138,136 C120,142 98,150 92,172 C88,192 92,208 100,224 C114,216 130,196 142,176 C140,160 138,148 138,136 Z']],
+ ['traps',60,['M199,108 L187,112 C170,122 152,130 138,136 C152,166 178,204 199,250 Z']]
+];
+const BASE='<path class="base" d="M200,108 L148,124 C128,134 118,150 116,172 C116,210 132,262 142,300 C146,330 132,350 130,384 L200,410 Z"/>'+
+'<path class="base" d="M97,146 C84,170 78,208 80,250 L72,312 C66,350 60,386 58,398 L86,398 C100,352 114,300 116,262 C118,226 120,190 130,160 Z"/>'+
+'<path class="base" d="M66,394 C60,412 58,428 62,440 C68,444 76,434 80,420 L84,396 Z"/>'+
+'<path class="base" d="M200,346 L132,356 C120,420 122,480 132,522 C128,566 128,626 140,674 L172,674 C177,626 176,576 180,540 L200,516 Z"/>'+
+'<path class="base" d="M138,672 C130,692 128,708 134,716 L178,716 C178,700 174,684 172,672 Z"/>'+
+'<path class="base" d="M188,80h12v34h-12z"/>';
+const KNEE='<ellipse class="base" cx="159" cy="530" rx="14" ry="12"/>';
+const HEAD='<ellipse class="base" cx="176" cy="58" rx="4" ry="9"/><ellipse class="base" cx="224" cy="58" rx="4" ry="9"/><ellipse class="base" cx="200" cy="52" rx="23" ry="30"/><path class="guide" d="M200,22V82M178,44Q200,38 222,44M177,64Q200,70 223,64"/>';
+
+/* ---------- copy ---------- */
+const INFO={
+ chest:['Pectoralis major','Pulls the arm forward and across the body. The main engine of every pressing movement.'],
+ 'delt-f':['Front deltoid','Lifts the arm forward and up. Takes over as the bar leaves the chest.'],
+ 'delt-r':['Rear deltoid','Pulls the arm back and out. Keeps the shoulder joint stable under load.'],
+ traps:['Trapezius','Raises, retracts and rotates the shoulder blades. Holds the upper back tight.'],
+ lats:['Latissimus dorsi','Pulls the arm down and back. The widest muscle of the back.'],
+ biceps:['Biceps brachii','Bends the elbow and turns the palm up.'],
+ triceps:['Triceps brachii','Straightens the elbow. Locks out every press.'],
+ forearms:['Forearm flexors and extensors','Control the wrist and fingers. Set your grip strength.'],
+ abs:['Rectus abdominis','Flexes the spine and braces the trunk against heavy loads.'],
+ obliques:['Obliques and serratus','Rotate and side-bend the trunk. The serratus anchors the shoulder blade.'],
+ lowback:['Erector spinae','Hold the spine neutral and extend the torso.'],
+ glutes:['Gluteus maximus','Extends the hip. The strongest driver in squats and deadlifts.'],
+ quads:['Quadriceps','Straighten the knee. Four heads share the work on the front of the thigh.'],
+ adductors:['Adductors','Pull the thigh inward and help stabilise the hip.'],
+ hams:['Hamstrings','Bend the knee and extend the hip.'],
+ calves:['Calves and shins','Point the foot, absorb impact and balance the ankle.']
+};
+const EX={
+ bench:['Barbell bench press',['chest'],['delt-f','triceps']],
+ ohp:['Overhead press',['delt-f'],['triceps','traps','chest','abs']],
+ squat:['Barbell back squat',['quads','glutes'],['adductors','hams','lowback','abs','calves']],
+ dead:['Conventional deadlift',['glutes','hams','lowback'],['traps','lats','quads','forearms','abs']],
+ pull:['Pull-up',['lats'],['biceps','delt-r','traps','forearms','abs']]
+};
+const SHORT={bench:'Bench press',ohp:'Overhead press',squat:'Squat',dead:'Deadlift',pull:'Pull-up'};
+
+/* ---------- extra detail from the anatomy references ---------- */
+Object.assign(INFO,{
+ tendon:['Tendons and fascia','Pale connective tissue that anchors muscle to bone: the abdominal aponeurosis, patellar ligament, IT band and Achilles tendon.'],
+ face:['Facial muscles','Frontalis, orbicularis oculi and oris, zygomaticus and masseter. They control expression and chewing.'],
+ sartorius:['Sartorius','The longest muscle in the body. Flexes and rotates the hip and bends the knee.'],
+ hipflex:['Iliopsoas and tensor fasciae latae','Lift the thigh and stabilise the pelvis. Tight hip flexors tilt the pelvis forward.'],
+ rotator:['Infraspinatus and teres','Rotate the arm and hold the shoulder in its socket.']
+});
+EX.squat[2].push('hipflex','sartorius');EX.dead[2].push('rotator');EX.pull[2].push('rotator');EX.ohp[2].push('rotator');
+document.querySelector('#fig defs').insertAdjacentHTML('beforeend','<radialGradient id="gt" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#f3ede0"/><stop offset=".6" stop-color="#cfc7b5"/><stop offset="1" stop-color="#8f8878"/></radialGradient>');
+const FING='<path class="base" d="M62,440L56,468L62,470L68,444ZM68,444L66,476L72,476L76,440ZM76,438L78,474L84,472L82,434ZM82,430L90,462L96,458L88,424ZM84,400L100,420L96,426L82,412Z"/>';
+FRONT.unshift(['tendon',90,['M183,212L200,212L200,320L183,320Z','M130,372L134,372L142,512L138,512Z','M154,516L166,516L164,546L156,546Z','M150,660L160,660L158,692L152,692Z','M170,660L176,660L176,690L172,690Z','M62,392L82,394L80,410L64,408Z']]);
+FRONT.push(
+ ['face',60,['M200,24C190,24 180,30 178,42L200,40Z','M182,48C186,44 194,44 197,48C194,53 186,53 182,48Z','M193,70C196,67 199,68 200,68L200,74C197,76 194,75 193,70Z','M184,60L196,68L194,70L182,62Z','M178,60C177,70 182,78 188,80L190,72Z']],
+ ['traps',70,['M184,88L190,86C192,100 196,114 199,124L192,126C188,112 185,100 184,88Z']],
+ ['biceps',70,['M92,262C90,282 92,296 96,304L104,304L100,270Z']],
+ ['forearms',60,['M100,308L112,318L104,326Z','M84,310C78,326 76,344 74,362L84,360C88,342 92,326 94,310Z']],
+ ['hipflex',60,['M182,330L198,340L196,352L180,344Z','M134,354C128,370 128,386 134,398L146,392C146,376 144,362 140,352Z']],
+ ['sartorius',50,['M146,350L152,346L194,438L186,444Z']],
+ ['adductors',80,['M192,358L198,358L196,440L192,440Z']],
+ ['calves',70,['M130,640C130,656 134,666 140,672L146,664L144,640Z']]
+);
+const FT=['M64,414L68,414L62,466L58,466Z','M69,416L73,416L70,474L66,474Z','M77,414L81,414L83,472L79,472Z','M82,412L86,412L93,458L89,458Z','M84,408L88,406L98,422L95,425Z','M58,452L66,454L66,457L58,455Z','M66,458L72,458L72,461L66,461Z','M78,454L83,454L83,457L78,457Z','M87,442L92,444L91,447L86,445Z','M62,420L80,422L79,426L63,424Z'];
+FRONT.push(['tendon',90,FT]);BACK.push(['tendon',90,FT]);
+BACK.unshift(['tendon',90,['M166,636L176,636L178,700L168,700Z','M150,520L162,522L160,548L152,548Z','M130,372L134,372L142,512L138,512Z']]);
+BACK.push(
+ ['glutes',30,['M168,326C154,322 142,328 138,342C150,346 164,342 176,336Z']],
+ ['obliques',55,['M140,310C132,326 132,336 138,342L150,332Z']],
+ ['rotator',50,['M146,172C158,180 166,192 172,204L152,200C148,190 146,180 146,172Z','M132,206C124,214 118,224 116,236L134,238L142,222Z']],
+ ['traps',70,['M200,84L190,86C188,100 192,108 199,110Z']],
+ ['forearms',60,['M84,312C80,336 76,360 70,384L78,386C88,360 94,336 96,312Z']]
+);
+
+/* ---------- zoom detail layer: fibre lines and leader labels (label = [text, pointX, pointY, labelY]) ---------- */
+const DET={
+'f:chest':{l:['M199,160C180,164 156,166 138,172','M199,174C180,178 158,182 136,188','M199,188C182,190 164,196 146,204','M198,146L152,150'],t:[['Clavicular head',160,150,120],['Sternal head',150,184,150],['Costal fibres',165,203,180]]},
+'f:delt-f':{l:['M112,150C104,172 102,196 106,218','M124,152C118,172 118,192 122,208'],t:[['Anterior deltoid',118,190,176],['Lateral deltoid',96,184,204]]},
+'f:biceps':{l:['M95,232C91,254 91,278 95,300','M101,232C99,254 101,276 101,298'],t:[['Short head',103,260,236],['Long head',92,252,262],['Brachialis',98,290,288]]},
+'f:abs':{l:['M199,212L199,316'],t:[['Rectus abdominis',192,250,236],['Tendinous inscription',192,238,206],['Linea alba',199,300,280]]},
+'f:obliques':{l:['M176,224C162,240 156,262 158,292','M170,222C158,238 152,258 152,280'],t:[['External oblique',160,250,226],['Serratus anterior',142,224,196]]},
+'f:quads':{l:['M148,390C146,430 148,470 152,500','M170,380C168,420 168,460 170,496'],t:[['Rectus femoris',168,420,396],['Vastus lateralis',142,450,426],['Vastus medialis',188,480,456]]},
+'f:adductors':{l:[],t:[['Adductor longus',190,390,372]]},
+'f:calves':{l:['M154,556C152,596 154,636 158,664'],t:[['Tibialis anterior',156,600,588],['Gastrocnemius',134,610,618]]},
+'f:forearms':{l:['M90,314C86,340 82,366 78,390','M96,314C94,340 90,366 86,390'],t:[['Flexor group',92,340,330],['Brachioradialis',84,324,356],['Pronator teres',106,316,302]]},
+'f:traps':{l:['M196,114C182,122 166,130 148,136'],t:[['Upper trapezius',170,130,100]]},
+'f:face':{l:[],t:[['Orbicularis oculi',190,48,30],['Zygomaticus',190,64,56],['Masseter',182,70,82]]},
+'f:sartorius':{l:[],t:[['Sartorius',170,396,360]]},
+'f:hipflex':{l:[],t:[['Iliopsoas',190,340,326],['Tensor fasciae latae',138,376,352]]},
+'b:traps':{l:['M199,130C190,160 184,190 190,228','M170,126C176,160 188,196 199,222'],t:[['Upper fibres',186,118,100],['Middle fibres',178,160,132],['Lower fibres',190,220,164]]},
+'b:lats':{l:['M150,216C146,250 150,284 160,312','M162,222C162,256 168,286 176,312'],t:[['Latissimus dorsi',156,270,246],['Teres major',126,226,214]]},
+'b:delt-r':{l:['M118,152C112,176 110,196 112,216'],t:[['Posterior deltoid',104,196,176]]},
+'b:triceps':{l:['M96,232C92,258 94,284 98,302','M104,232C104,258 104,282 104,300'],t:[['Long head',100,250,236],['Lateral head',90,270,262]]},
+'b:lowback':{l:['M192,262L192,330'],t:[['Erector spinae',190,300,286]]},
+'b:glutes':{l:['M190,350C170,350 152,362 142,384'],t:[['Gluteus maximus',170,380,356],['Gluteus medius',158,334,330]]},
+'b:hams':{l:['M164,420C166,460 166,496 164,520'],t:[['Biceps femoris',150,450,420],['Semitendinosus',180,450,446],['Semimembranosus',186,490,472]]},
+'b:calves':{l:['M166,552C166,590 166,620 166,634'],t:[['Gastrocnemius, medial',178,590,566],['Gastrocnemius, lateral',150,590,592],['Soleus',166,656,640]]},
+'b:rotator':{l:[],t:[['Infraspinatus',158,188,160],['Teres major',128,224,190]]},
+'b:forearms':{l:[],t:[['Extensor digitorum',88,340,320],['Extensor carpi',80,330,346]]},
+'b:obliques':{l:[],t:[['External oblique',142,320,296]]}
+};
+const PA=(()=>{const S='Sagittal plane',F='Frontal plane',T='Transverse plane',FA='Frontal axis',SA='Sagittal axis',VA='Vertical axis',LA='Longitudinal axis';return {
+ chest:[['Shoulder horizontal adduction',T,VA],['Shoulder flexion (upper fibres)',S,FA],['Shoulder internal rotation',T,VA]],
+ 'delt-f':[['Shoulder flexion',S,FA],['Shoulder horizontal adduction',T,VA]],
+ 'delt-r':[['Shoulder extension',S,FA],['Horizontal abduction',T,VA],['External rotation',T,VA]],
+ traps:[['Scapular upward rotation',F,SA],['Scapular retraction (glide)',T,VA],['Neck extension',S,FA]],
+ lats:[['Shoulder extension',S,FA],['Shoulder adduction',F,SA],['Internal rotation',T,VA]],
+ biceps:[['Elbow flexion',S,FA],['Forearm supination',T,LA]],
+ triceps:[['Elbow extension',S,FA],['Shoulder extension (long head)',S,FA]],
+ forearms:[['Wrist flexion and extension',S,FA],['Radial and ulnar deviation',F,SA],['Pronation',T,LA]],
+ abs:[['Trunk flexion',S,FA],['Posterior pelvic tilt',S,FA]],
+ obliques:[['Trunk rotation',T,VA],['Lateral flexion',F,SA]],
+ lowback:[['Trunk extension',S,FA],['Lateral flexion',F,SA]],
+ glutes:[['Hip extension',S,FA],['Hip abduction (medius)',F,SA],['Hip external rotation',T,VA]],
+ quads:[['Knee extension',S,FA],['Hip flexion (rectus femoris)',S,FA]],
+ adductors:[['Hip adduction',F,SA],['Hip flexion assist',S,FA]],
+ hams:[['Knee flexion',S,FA],['Hip extension',S,FA]],
+ calves:[['Ankle plantarflexion',S,FA],['Dorsiflexion (shin)',S,FA],['Inversion and eversion (approx.)',F,SA]],
+ sartorius:[['Hip flexion',S,FA],['Hip abduction and external rotation',F+' and transverse',SA+' and vertical'],['Knee flexion',S,FA]],
+ hipflex:[['Hip flexion',S,FA],['Hip abduction (TFL)',F,SA]],
+ rotator:[['Shoulder external rotation',T,VA],['Shoulder abduction (supraspinatus)',F,SA]],
+ face:[['Jaw closing (masseter)',S,FA]]
+};})();
+function mv(id){const a=PA[id];return a?`<span class="tag" style="background:#3a3a3f;color:#fff">${T('Planes and axes')}</span>`+a.map(([n,p,x])=>`<p class="sm">${T(n)}<small>${T(p)} · ${T(x)}</small></p>`).join(''):''}
+const ANT={chest:'latissimus dorsi and rear deltoids',lats:'pectoralis major',biceps:'triceps brachii',triceps:'biceps brachii',quads:'hamstrings',hams:'quadriceps',abs:'erector spinae',lowback:'rectus abdominis','delt-f':'rear deltoid and lats',glutes:'hip flexors',hipflex:'glutes',calves:'tibialis anterior'};
+function dt(v,m){return Object.keys(DET).filter(k=>k[0]===v).map(k=>{const id=k.slice(2),d=DET[k];let s=d.l.map(p=>`<path d='${p}'/>`).join('');
+ if(!m)s+=d.t.map(([t,px,py,ly])=>`<path class='ld' d='M${4+t.length*3.3+3},${ly-2}L${px},${py}'/><circle cx='${px}' cy='${py}' r='1.3' fill='#fff'/><text x='4' y='${ly}' data-e='${t}' data-px='${px}' data-py='${py}' data-ly='${ly}'>${t}</text>`).join('');
+ return `<g class='dt' data-d='${id}'>${s}</g>`}).join('')}
+function setVB(a){vb=a;fig.setAttribute('viewBox',a.join(' '))}
+function animVB(to){cancelAnimationFrame(raf);const D=matchMedia('(prefers-reduced-motion:reduce)').matches?0:650;if(!D){setVB(to);return}
+ const from=vb.slice(),t0=performance.now();(function s(t){let k=Math.min(1,(t-t0)/D);k=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;setVB(from.map((v,i)=>v+(to[i]-v)*k));if(k<1)raf=requestAnimationFrame(s)})(t0)}
+function zoomTo(g){const vw=g.closest('[data-vw]'),id=g.dataset.m,inv=fig.getScreenCTM().inverse();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
+ vw.querySelectorAll(`.m[data-m='${id}'],.dt[data-d='${id}']`).forEach(e=>{const r=e.getBoundingClientRect();[[r.left,r.top],[r.right,r.bottom]].forEach(([x,y])=>{const p=new DOMPoint(x,y).matrixTransform(inv);x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x);y1=Math.max(y1,p.y)})});
+ const ar=home[2]/home[3],pd=12;let w=Math.max(x1-x0+2*pd,90),h=y1-y0+2*pd;if(w/h>ar)h=w/ar;else w=h*ar;w=Math.min(w,home[2]);h=w/ar;
+ animVB([(x0+x1)/2-w/2,(y0+y1)/2-h/2,w,h])}
+function resetZoom(){sel=null;paint();animVB(home.slice())}
+
+/* ---------- deep layer: right half of each figure ---------- */
+const DEEPIDS=new Set(['pec-minor','serratus','int-obl','bicep-s','bicep-l','brachialis','coraco','forearm-deep','vast-int','psoas','adductors-d','rhomb','supra','infra','tri-long','tri-lat','tri-med','ql','glute-deep','soleus']);
+Object.assign(INFO,{
+'pec-minor':['Pectoralis minor','Lies beneath pectoralis major. Pulls the shoulder blade forward and down.'],
+serratus:['Serratus anterior','Wraps the ribs and holds the shoulder blade against the chest. Key for pushing and overhead reach.'],
+'int-obl':['Internal oblique and transversus abdominis','Deep abdominal layers under the external obliques. They brace the trunk like a natural weight belt.'],
+'bicep-s':['Biceps, short head','Starts at the coracoid process of the shoulder blade. Works with the long head to bend the elbow.'],
+'bicep-l':['Biceps, long head','Its tendon runs up the groove of the humerus, hidden under the deltoid and pectoralis, and attaches inside the shoulder joint.'],
+brachialis:['Brachialis','Lies under the biceps. The strongest pure elbow flexor.'],
+coraco:['Coracobrachialis','Small muscle under the biceps that lifts the arm forward and across the body.'],
+'forearm-deep':['Deep forearm muscles','Supinator and flexor digitorum profundus lie beneath the surface layer. They turn the palm and curl the fingers.'],
+'vast-int':['Vastus intermedius','Lies directly under rectus femoris. Extends the knee.'],
+psoas:['Psoas major and iliacus','Deep hip flexors that run from the lower spine through the pelvis to the thigh.'],
+'adductors-d':['Adductor magnus and brevis','Deep inner-thigh muscles. They pull the leg inward and help extend the hip.'],
+rhomb:['Rhomboids','Lie under the trapezius and pull the shoulder blades toward the spine.'],
+supra:['Supraspinatus','Rotator cuff muscle under the trapezius. Starts lifting the arm out to the side.'],
+infra:['Infraspinatus and teres minor','Rotator cuff muscles on the back of the shoulder blade. Turn the arm outward.'],
+'tri-long':['Triceps, long head','Crosses the shoulder joint, so it also helps extend the arm backward.'],
+'tri-lat':['Triceps, lateral head','The outer head on the side of the arm. Strong in heavy pressing.'],
+'tri-med':['Triceps, medial head','Lies deep under the other two heads. Works in every elbow extension.'],
+ql:['Quadratus lumborum','Deep lower-back muscle that side-bends the trunk and steadies the pelvis.'],
+'glute-deep':['Gluteus medius, minimus and piriformis','Lie under gluteus maximus. They abduct and rotate the hip and level the pelvis when you walk.'],
+soleus:['Soleus','Lies under the gastrocnemius. Keeps you upright and drives walking and running.']});
+(()=>{const S='Sagittal plane',F='Frontal plane',T='Transverse plane',FA='Frontal axis',SA='Sagittal axis',VA='Vertical axis',LA='Longitudinal axis';
+Object.assign(PA,{'pec-minor':[['Scapular protraction (glide)',T,VA]],serratus:[['Scapular upward rotation',F,SA],['Scapular protraction (glide)',T,VA]],'int-obl':[['Trunk rotation',T,VA],['Lateral flexion',F,SA]],'bicep-s':[['Elbow flexion',S,FA],['Forearm supination',T,LA]],'bicep-l':[['Elbow flexion',S,FA],['Forearm supination',T,LA],['Shoulder flexion',S,FA]],brachialis:[['Elbow flexion',S,FA]],coraco:[['Shoulder flexion',S,FA],['Shoulder adduction',F,SA]],'forearm-deep':[['Forearm supination',T,LA],['Wrist flexion and extension',S,FA]],'vast-int':[['Knee extension',S,FA]],psoas:[['Hip flexion',S,FA]],'adductors-d':[['Hip adduction',F,SA]],rhomb:[['Scapular retraction (glide)',T,VA]],supra:[['Shoulder abduction (supraspinatus)',F,SA]],infra:[['Shoulder external rotation',T,VA]],'tri-long':[['Elbow extension',S,FA],['Shoulder extension (long head)',S,FA]],'tri-lat':[['Elbow extension',S,FA]],'tri-med':[['Elbow extension',S,FA]],ql:[['Lateral flexion',F,SA],['Trunk extension',S,FA]],'glute-deep':[['Hip abduction (medius)',F,SA],['Hip external rotation',T,VA]],soleus:[['Ankle plantarflexion',S,FA]]})})();
+Object.assign(DET,{
+'f:pec-minor':{l:[],t:[['Pectoralis minor',164,176,150]]},'f:serratus':{l:[],t:[['Serratus anterior',140,200,236]]},'f:bicep-l':{l:[],t:[['Biceps, long head',92,260,270]]},'f:bicep-s':{l:[],t:[['Biceps, short head',104,262,246]]},'f:brachialis':{l:[],t:[['Brachialis',100,296,300]]},'f:coraco':{l:[],t:[['Coracobrachialis',128,196,210]]},'f:int-obl':{l:[],t:[['Internal oblique',166,290,280]]},'f:vast-int':{l:[],t:[['Vastus intermedius',166,440,420]]},'f:psoas':{l:[],t:[['Psoas and iliacus',172,368,340]]},'f:adductors-d':{l:[],t:[['Adductor magnus',192,400,380]]},'f:forearm-deep':{l:[],t:[['Supinator, FDP',100,330,340]]},
+'b:rhomb':{l:[],t:[['Rhomboids',170,160,120]]},'b:supra':{l:[],t:[['Supraspinatus',152,144,110]]},'b:infra':{l:[],t:[['Infraspinatus',152,178,160]]},'b:tri-long':{l:[],t:[['Long head',108,250,236]]},'b:tri-lat':{l:[],t:[['Lateral head',90,270,262]]},'b:tri-med':{l:[],t:[['Medial head',98,290,288]]},'b:ql':{l:[],t:[['Quadratus lumborum',178,322,296]]},'b:glute-deep':{l:[],t:[['Gluteus medius',160,350,340]]},'b:soleus':{l:[],t:[['Soleus',162,600,590]]}});
+const DEEPF=[
+['int-obl',55,['M180,226C164,236 150,254 146,280C146,304 154,324 168,336L180,322C174,300 176,262 184,240Z','M184,250C172,254 160,268 156,290C156,306 162,318 172,326L182,316C178,300 180,272 186,260Z']],
+['serratus',55,[0,1,2,3,4,5,6,7].map(i=>{const x=[134,132,130,130,132,136,140,146][i],y=150+i*14;return `M${x},${y}L${x+16},${y+5}L${x+14},${y+14}L${x-2},${y+9}Z`})],
+['pec-minor',20,['M146,150L152,152L180,186L176,196L166,192L156,178L144,160Z']],
+['psoas',60,['M186,330C180,346 176,366 170,386L162,380C168,360 176,344 182,328Z','M170,330C160,336 150,348 146,366L154,372C160,356 168,346 176,340Z']],
+['vast-int',80,['M158,372C152,408 152,452 158,496L174,496C178,452 176,408 170,372Z']],
+['adductors-d',70,['M186,350L198,350C198,384 196,416 190,440C184,420 184,384 186,350Z','M176,356C172,372 172,388 178,402L184,396C180,384 180,370 182,358Z']],
+['calves',85,['M148,556C146,590 148,630 154,664L160,664C158,630 156,590 156,556Z','M136,566C132,596 136,626 142,650L148,640C146,616 144,590 146,566Z']],
+['forearm-deep',70,['M100,310C96,324 92,346 88,372L96,370C102,346 108,326 112,312Z','M84,314C80,334 76,358 72,380L80,378C84,356 90,334 94,316Z']],
+['brachialis',85,['M92,262C90,282 92,296 96,306L108,306C110,292 108,272 104,258Z']],
+['coraco',80,['M142,166C136,184 128,206 120,230L113,226C121,204 130,184 136,164Z']],
+['bicep-l',88,['M86,232C82,252 84,280 90,302L98,302C98,280 98,252 97,232Z']],
+['bicep-s',88,['M97,230C98,252 98,280 98,302L108,302C110,280 108,250 104,230Z']],
+['tendon',90,['M126,142L130,144L99,232L94,230Z','M148,152L152,152L106,230L101,230Z','M92,300L106,300L99,314Z']]];
+const DEEPB=[
+['adductors-d',70,['M186,420C182,450 182,480 186,512L198,512C198,480 198,450 196,420Z']],
+['soleus',85,['M146,566C140,590 142,620 150,650L176,650C182,620 180,590 172,566Z']],
+['forearm-deep',70,['M84,312C80,336 76,360 70,384L78,386C88,360 94,336 96,312Z']],
+['glute-deep',40,['M180,326C160,318 142,326 136,346C134,362 142,376 160,380L186,376Z','M192,376C176,376 160,380 148,392L150,402C164,392 178,388 194,388Z']],
+['ql',90,['M186,300C178,306 172,322 170,340L180,342C182,326 186,312 190,304Z']],
+['rhomb',60,['M198,132L170,140L150,170L168,186L198,170Z']],
+['supra',85,['M170,138C156,130 140,134 130,140L136,154C148,150 160,150 172,152Z']],
+['infra',40,['M172,158C160,156 144,156 134,162C128,172 128,188 136,198L168,200C172,186 174,170 172,158Z','M134,198L132,214L146,216L150,200Z']],
+['tri-long',85,['M124,198C114,210 108,230 106,262C105,280 106,292 108,304L98,304C96,288 96,270 98,250C100,232 108,214 118,198Z']],
+['tri-lat',85,['M92,232C86,250 84,276 88,302L98,302C98,276 98,252 98,236Z']],
+['tri-med',85,['M94,262C92,278 92,294 96,306L106,306C106,292 104,276 100,260Z']],
+['tendon',90,['M166,636L176,636L178,700L168,700Z','M150,520L162,522L160,548L152,548Z']]];
+const RBK='<g>'+[...Array(10)].map((_,i)=>{const y=130+i*11,xl=200-[36,46,53,58,61,62,61,58,54,48][i];return `<path class='bk' d='M194,${y}C${xl+16},${y-6} ${xl},${y+4} ${xl+4},${y+30}'/>`}).join('')+'</g>';
+function dt(v,m){return Object.keys(DET).filter(k=>k[0]===v).map(k=>{const id=k.slice(2),d=DET[k],dp=DEEPIDS.has(id);let s='';
+ if(m){if(dp)s=d.l.map(p=>`<path d='${p}'/>`).join('')}
+ else{if(!dp)s=d.l.map(p=>`<path d='${p}'/>`).join('');
+  s+=d.t.map(([t,px,py,ly])=>dp?`<path class='ld' d='M${396-t.length*3.3-3},${ly-2}L${400-px},${py}'/><circle cx='${400-px}' cy='${py}' r='1.3' fill='#fff'/><text x='396' y='${ly}' text-anchor='end' data-r='1' data-e='${t}' data-px='${px}' data-py='${py}' data-ly='${ly}'>${t}</text>`:`<path class='ld' d='M${4+t.length*3.3+3},${ly-2}L${px},${py}'/><circle cx='${px}' cy='${py}' r='1.3' fill='#fff'/><text x='4' y='${ly}' data-e='${t}' data-px='${px}' data-py='${py}' data-ly='${ly}'>${t}</text>`).join('')}
+ return `<g class='dt' data-d='${id}'>${s}</g>`}).join('')}
+
+/* ---------- build ---------- */
+const angles=new Set();
+function half(list,mirror){
+  return list.map(([id,a,ps])=>{angles.add(a);
+    const att=mirror&&!DEEPIDS.has(id)?'aria-hidden="true"':`tabindex="0" role="button" aria-label="${INFO[id][0]}"`;
+    return `<g class="m" data-m="${id}" ${att}>`+ps.map(d=>d[d.length-1]==='6'&&false?'':
+      `<path class="mb" d="${d}"/><path class="mf" d="${d}" fill="url(#p${a})"/>`).join('')+'</g>';
+  }).join('');
+}
+function view(list,ox,extra){
+  const h=(m)=>BASE+extra+(m&&list!==BACK?RBK:'')+half(m?(list===BACK?DEEPB:DEEPF):list,m)+dt(list===BACK?'b':'f',m);
+  return `<g data-vw="${list===BACK?'b':'f'}" transform="translate(${ox},0)">${HEAD}<text class='sct' data-e='Superficial' x='100' y='12'>Superficial</text><text class='sct' data-e='Deep' x='300' y='12'>Deep</text><g>${h(false)}</g><g transform="translate(400,0) scale(-1,1)">${h(true)}</g>`+
+    `<path class="guide" d="M200,112V${list===BACK?404:330}"/></g>`;
+}
+const body=view(FRONT,0,KNEE+FING)+view(BACK,400,FING);
+document.getElementById('views').innerHTML=body;
+const defs=document.querySelector('#fig defs');
+angles.forEach(a=>defs.insertAdjacentHTML('beforeend',
+ `<pattern id="p${a}" width="3.4" height="3.4" patternUnits="userSpaceOnUse" patternTransform="rotate(${a})"><line x1="0" y1="0" x2="0" y2="3.4" stroke="#000" stroke-opacity=".32" stroke-width="1"/></pattern>`));
+
+/* ---------- state ---------- */
+let ex='bench',sel=null,home=[0,0,800,740],vb=home.slice(),raf;
+const zr=document.getElementById('zr');zr.onclick=()=>resetZoom();
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sel)resetZoom()});
+const fig=document.getElementById('fig'),info=document.getElementById('info');
+const SEC={chest:['delt-f','triceps'],'delt-f':['chest','triceps','traps'],'delt-r':['lats','traps','rotator','triceps'],traps:['delt-r','rotator','lats'],lats:['biceps','delt-r','rotator','forearms'],biceps:['forearms','lats'],triceps:['chest','delt-f'],forearms:['biceps'],abs:['obliques','hipflex'],obliques:['abs','lowback'],lowback:['glutes','hams','traps'],glutes:['hams','quads','lowback','adductors'],quads:['glutes','calves','hipflex'],adductors:['glutes','quads'],hams:['glutes','calves','lowback'],calves:['hams','quads'],sartorius:['hipflex','quads'],hipflex:['quads','abs','sartorius'],rotator:['delt-r','traps','lats']};
+function role(id){return id===sel?'p':(SEC[sel]||[]).includes(id)?'s':''}
+function paint(){
+  
+  fig.querySelectorAll('.m').forEach(el=>{const r=role(el.dataset.m);
+    el.classList.toggle('p',r==='p');el.classList.toggle('s',r==='s');el.classList.toggle('sel',el.dataset.m===sel)});
+  fig.querySelectorAll('.dt').forEach(d=>d.classList.toggle('on',d.dataset.d===sel));zr.hidden=!sel;
+  
+  if(!sel){info.innerHTML=`<p>${T('Tap a muscle to learn more.')}</p>`;return}
+  const r=role(sel),[n0,t0]=INFO[sel],n=T(n0),t=lang==='ar'&&ARD[sel]||t0;
+  const tag='';
+  const sl=(SEC[sel]||[]);
+  info.innerHTML=`<b>${n}</b><span class="tag" style="background:var(--pri);color:#fff">${T('Primary')}</span><p>${t}</p>`+(ANT[sel]?`<p class="sm">${T('Opposed by')} ${T(ANT[sel])}</p>`:'')+mv(sel)+(sl.length?`<span class="tag" style="background:var(--sec);color:#111">${T('Secondary')}</span>`+sl.map(i=>`<p class="sm">${T(INFO[i][0])}</p>`).join(''):'');
+  [...info.children].forEach((c,i)=>c.style.setProperty('--i',i));
+}
+
+
+fig.addEventListener('click',e=>{const g=e.target.closest('.m');if(g){sel=g.dataset.m;paint();zoomTo(g)}else if(sel)resetZoom()});
+fig.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){const g=e.target.closest('.m');if(g){e.preventDefault();sel=g.dataset.m;paint();zoomTo(g)}}});
+const VB={f:'0 0 400 740',b:'400 0 400 740',both:'0 0 800 740'};
+document.querySelector('.seg').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  cancelAnimationFrame(raf);home=VB[b.dataset.v].split(' ').map(Number);setVB(home.slice());sel=null;paint();
+  document.querySelectorAll('.seg button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  const l=document.querySelector('.lbl');l.style.display='flex';
+  curV=b.dataset.v;lbl()};
+/* ---------- Arabic ---------- */
+const ARN={'Muscle map':'خريطة العضلات','Front':'أمامي','Back':'خلفي','Both':'الاثنان','FRONT':'أمامي','BACK':'خلفي','Primary':'رئيسية','Secondary':'مساعدة','Reset view':'إعادة العرض','Tap a muscle to learn more.':'اضغط على عضلة لتعرف المزيد.','Opposed by':'العضلة المضادة:','Planes and axes':'المستويات والمحاور',
+'Pectoralis major':'العضلة الصدرية الكبرى','Front deltoid':'العضلة الدالية الأمامية','Rear deltoid':'العضلة الدالية الخلفية','Trapezius':'العضلة شبه المنحرفة','Latissimus dorsi':'العضلة الظهرية العريضة','Biceps brachii':'العضلة ذات الرأسين العضدية','Triceps brachii':'العضلة ثلاثية الرؤوس العضدية','Forearm flexors and extensors':'عضلات الساعد القابضة والباسطة','Rectus abdominis':'العضلة المستقيمة البطنية','Obliques and serratus':'العضلات المائلة والمنشارية','Erector spinae':'العضلة الناصبة للعمود الفقري','Gluteus maximus':'العضلة الألوية الكبرى','Quadriceps':'العضلة رباعية الرؤوس الفخذية','Adductors':'العضلات المقربة','Hamstrings':'عضلات الفخذ الخلفية','Calves and shins':'عضلات الساق','Tendons and fascia':'الأوتار والصفاق','Facial muscles':'عضلات الوجه','Sartorius':'العضلة الخياطية','Iliopsoas and tensor fasciae latae':'الحرقفية القطنية والموترة للفافة العريضة','Infraspinatus and teres':'تحت الشوكية والمدورة',
+'latissimus dorsi and rear deltoids':'الظهرية العريضة والدالية الخلفية','pectoralis major':'الصدرية الكبرى','triceps brachii':'ثلاثية الرؤوس','biceps brachii':'ذات الرأسين','hamstrings':'عضلات الفخذ الخلفية','quadriceps':'رباعية الرؤوس','erector spinae':'الناصبة للعمود الفقري','rectus abdominis':'المستقيمة البطنية','rear deltoid and lats':'الدالية الخلفية والظهرية العريضة','hip flexors':'عضلات ثني الورك','glutes':'الألوية','tibialis anterior':'الظنبوبية الأمامية',
+'Clavicular head':'الرأس الترقوي','Sternal head':'الرأس القصي','Costal fibres':'الألياف الضلعية','Anterior deltoid':'الدالية الأمامية','Lateral deltoid':'الدالية الجانبية','Short head':'الرأس القصير','Long head':'الرأس الطويل','Brachialis':'العضدية','Tendinous inscription':'التقاطعات الوترية','Linea alba':'الخط الأبيض','External oblique':'المائلة الخارجية','Serratus anterior':'المنشارية الأمامية','Rectus femoris':'المستقيمة الفخذية','Vastus lateralis':'المتسعة الوحشية','Vastus medialis':'المتسعة الإنسية','Adductor longus':'المقربة الطويلة','Tibialis anterior':'الظنبوبية الأمامية','Gastrocnemius':'التوأمية','Flexor group':'مجموعة القابضات','Brachioradialis':'العضدية الكعبرية','Pronator teres':'الكابّة المدورة','Upper trapezius':'شبه المنحرفة العلوية','Orbicularis oculi':'الدويرية العينية','Zygomaticus':'الوجنية','Masseter':'الماضغة','Iliopsoas':'الحرقفية القطنية','Tensor fasciae latae':'الموترة للفافة العريضة','Upper fibres':'الألياف العلوية','Middle fibres':'الألياف الوسطى','Lower fibres':'الألياف السفلية','Teres major':'المدورة الكبرى','Posterior deltoid':'الدالية الخلفية','Lateral head':'الرأس الوحشي','Gluteus medius':'الألوية الوسطى','Biceps femoris':'ذات الرأسين الفخذية','Semitendinosus':'نصف الوترية','Semimembranosus':'نصف الغشائية','Gastrocnemius, medial':'التوأمية الإنسية','Gastrocnemius, lateral':'التوأمية الوحشية','Soleus':'النعلية','Infraspinatus':'تحت الشوكية','Extensor digitorum':'باسطة الأصابع','Extensor carpi':'باسطة الرسغ',
+'Shoulder horizontal adduction':'تقريب أفقي للكتف','Shoulder flexion (upper fibres)':'ثني الكتف (الألياف العليا)','Shoulder internal rotation':'دوران الكتف للداخل','Shoulder flexion':'ثني الكتف','Shoulder extension':'بسط الكتف','Horizontal abduction':'إبعاد أفقي','External rotation':'دوران للخارج','Scapular upward rotation':'دوران لوح الكتف لأعلى','Scapular retraction (glide)':'سحب لوح الكتف للخلف (انزلاق)','Neck extension':'بسط الرقبة','Shoulder adduction':'تقريب الكتف','Internal rotation':'دوران للداخل','Elbow flexion':'ثني المرفق','Forearm supination':'استلقاء الساعد (قلب الكف لأعلى)','Elbow extension':'بسط المرفق','Shoulder extension (long head)':'بسط الكتف (الرأس الطويل)','Wrist flexion and extension':'ثني وبسط الرسغ','Radial and ulnar deviation':'الانحراف الكعبري والزندي','Pronation':'كب الساعد (قلب الكف لأسفل)','Trunk flexion':'ثني الجذع','Posterior pelvic tilt':'ميلان الحوض للخلف','Trunk rotation':'دوران الجذع','Lateral flexion':'الثني الجانبي','Trunk extension':'بسط الجذع','Hip extension':'بسط الورك','Hip abduction (medius)':'إبعاد الورك (الوسطى)','Hip external rotation':'دوران الورك للخارج','Knee extension':'بسط الركبة','Hip flexion (rectus femoris)':'ثني الورك (المستقيمة الفخذية)','Hip adduction':'تقريب الورك','Hip flexion assist':'مساعدة في ثني الورك','Knee flexion':'ثني الركبة','Ankle plantarflexion':'ثني الكاحل للأسفل','Dorsiflexion (shin)':'ثني الكاحل للأعلى (الساق)','Inversion and eversion (approx.)':'قلب القدم للداخل والخارج (تقريبي)','Hip flexion':'ثني الورك','Hip abduction and external rotation':'إبعاد الورك ودورانه للخارج','Hip abduction (TFL)':'إبعاد الورك (الموترة)','Shoulder external rotation':'دوران الكتف للخارج','Shoulder abduction (supraspinatus)':'إبعاد الكتف (فوق الشوكية)','Jaw closing (masseter)':'إغلاق الفك (الماضغة)',
+'Sagittal plane':'المستوى السهمي','Frontal plane':'المستوى الجبهي','Transverse plane':'المستوى المستعرض','Frontal axis':'المحور الجبهي','Sagittal axis':'المحور السهمي','Vertical axis':'المحور الرأسي','Longitudinal axis':'المحور الطولي','Frontal plane and transverse':'المستوى الجبهي والمستعرض','Sagittal axis and vertical':'المحور السهمي والرأسي'};
+const ARD={chest:'تسحب الذراع للأمام وعبر الجسم. المحرك الرئيسي لجميع حركات الدفع.','delt-f':'ترفع الذراع للأمام ولأعلى. تتولى الحركة عندما يغادر البار الصدر.','delt-r':'تسحب الذراع للخلف وللخارج. تثبّت مفصل الكتف تحت الحمل.',traps:'ترفع لوحي الكتف وتسحبهما للخلف وتديرهما. تُبقي أعلى الظهر مشدودًا.',lats:'تسحب الذراع للأسفل وللخلف. أعرض عضلة في الظهر.',biceps:'تثني المرفق وتقلب الكف لأعلى.',triceps:'تبسط المرفق. تُكمل حركة الدفع حتى القفل.',forearms:'تتحكم في الرسغ والأصابع. تحدد قوة القبضة.',abs:'تثني العمود الفقري وتثبّت الجذع أمام الأحمال الثقيلة.',obliques:'تدير الجذع وتثنيه جانبيًا. وتثبّت المنشارية لوح الكتف.',lowback:'تحافظ على استقامة العمود الفقري وتبسط الجذع.',glutes:'تبسط الورك. أقوى محرك في السكوات والرفعة الميتة.',quads:'تبسط الركبة. تتشارك أربعة رؤوس العمل في مقدمة الفخذ.',adductors:'تسحب الفخذ للداخل وتساعد في تثبيت الورك.',hams:'تثني الركبة وتبسط الورك.',calves:'تحرّك القدم للأسفل وتمتص الصدمات وتحافظ على توازن الكاحل.',tendon:'أنسجة ضامة شاحبة تربط العضلة بالعظم: صفاق البطن، الرباط الرضفي، الشريط الحرقفي الظنبوبي، ووتر أخيل.',face:'العضلة الجبهية والحجاجية والفموية والوجنية والماضغة. تتحكم في تعابير الوجه والمضغ.',sartorius:'أطول عضلة في الجسم. تثني الورك وتديره وتثني الركبة.',hipflex:'ترفع الفخذ وتثبّت الحوض. شد عضلات ثني الورك يميل بالحوض للأمام.',rotator:'تدير الذراع وتثبّت الكتف داخل مفصله.'};
+let lang='en',curV='both';
+const T=s=>lang==='ar'&&ARN[s]||s;
+function lbl(){document.querySelector('.lbl').innerHTML=curV==='f'?`<span>${T('FRONT')}</span>`:curV==='b'?`<span>${T('BACK')}</span>`:`<span>${T('FRONT')}</span><span>${T('BACK')}</span>`}
+function applyLang(){document.documentElement.lang=lang;document.getElementById('title').textContent=T(skel?'Skeleton':'Muscle map');
+ document.querySelectorAll('.seg button').forEach(b=>b.textContent=T({f:'Front',b:'Back',both:'Both'}[b.dataset.v]));
+ document.querySelectorAll('.legend span').forEach((s,i)=>s.lastChild.textContent=T(i?'Secondary':'Primary'));
+ zr.textContent=T('Reset view');fig.querySelectorAll('.sct').forEach(x=>x.textContent=T(x.dataset.e));document.getElementById('lang').textContent=lang==='ar'?'EN':'AR';
+ fig.querySelectorAll('.m[aria-label]').forEach(g=>g.setAttribute('aria-label',T(INFO[g.dataset.m][0])));
+ fig.querySelectorAll('.dt text').forEach(x=>{x.textContent=T(x.dataset.e);const r=x.dataset.r,L=x.textContent.length*3.3+3;x.previousElementSibling.previousElementSibling.setAttribute('d',r?`M${396-L},${+x.dataset.ly-2}L${400-x.dataset.px},${x.dataset.py}`:`M${4+L},${+x.dataset.ly-2}L${x.dataset.px},${x.dataset.py}`)});
+ paint();lbl()}
+Object.assign(ARN,{'Superficial':'سطحية','Deep':'عميقة','Scapular protraction (glide)':'دفع لوح الكتف للأمام (انزلاق)','Pectoralis minor':'العضلة الصدرية الصغرى','Biceps, short head':'ذات الرأسين، الرأس القصير','Biceps, long head':'ذات الرأسين، الرأس الطويل','Coracobrachialis':'العضلة الغرابية العضدية','Deep forearm muscles':'عضلات الساعد العميقة','Internal oblique and transversus abdominis':'المائلة الداخلية والبطنية المستعرضة','Vastus intermedius':'المتسعة المتوسطة','Psoas major and iliacus':'القطنية الكبرى والحرقفية','Adductor magnus and brevis':'المقربة الكبرى والقصيرة','Rhomboids':'العضلات المعينية','Supraspinatus':'فوق الشوكية','Infraspinatus and teres minor':'تحت الشوكية والمدورة الصغرى','Triceps, long head':'ثلاثية الرؤوس، الرأس الطويل','Triceps, lateral head':'ثلاثية الرؤوس، الرأس الوحشي','Triceps, medial head':'ثلاثية الرؤوس، الرأس الإنسي','Quadratus lumborum':'العضلة المربعة القطنية','Gluteus medius, minimus and piriformis':'الألوية الوسطى والصغرى والكمثرية','Medial head':'الرأس الإنسي','Internal oblique':'المائلة الداخلية','Psoas and iliacus':'القطنية والحرقفية','Adductor magnus':'المقربة الكبرى','Supinator, FDP':'المستلقية والقابضة العميقة'});
+Object.assign(ARD,{'pec-minor':'تقع تحت الصدرية الكبرى. تسحب لوح الكتف للأمام وللأسفل.',serratus:'تلتف حول الأضلاع وتثبّت لوح الكتف على الصدر. مهمة للدفع والوصول للأعلى.','int-obl':'طبقات بطنية عميقة تحت المائلة الخارجية. تشد الجذع مثل حزام طبيعي.','bicep-s':'تبدأ من النتوء الغرابي للوح الكتف. تعمل مع الرأس الطويل لثني المرفق.','bicep-l':'يمر وترها في أخدود العضد تحت الدالية والصدرية وترتبط داخل مفصل الكتف.',brachialis:'تقع تحت ذات الرأسين. أقوى عضلة ثانية للمرفق.',coraco:'عضلة صغيرة تحت ذات الرأسين ترفع الذراع للأمام وعبر الجسم.','forearm-deep':'المستلقية والقابضة العميقة للأصابع تقع تحت الطبقة السطحية. تقلب الكف وتثني الأصابع.','vast-int':'تقع مباشرة تحت المستقيمة الفخذية. تبسط الركبة.',psoas:'عضلات ثني الورك العميقة تمتد من أسفل العمود الفقري عبر الحوض إلى الفخذ.','adductors-d':'عضلات عميقة في الفخذ الداخلي. تسحب الساق للداخل وتساعد في بسط الورك.',rhomb:'تقع تحت شبه المنحرفة وتسحب لوحي الكتف نحو العمود الفقري.',supra:'عضلة من الكفة المدورة تحت شبه المنحرفة. تبدأ رفع الذراع للجانب.',infra:'عضلات الكفة المدورة خلف لوح الكتف. تدير الذراع للخارج.','tri-long':'تعبر مفصل الكتف لذلك تساعد أيضًا في بسط الذراع للخلف.','tri-lat':'الرأس الخارجي الظاهر في جانب الذراع. قوي في الدفع الثقيل.','tri-med':'يقع عميقًا تحت الرأسين الآخرين. يعمل في كل بسط للمرفق.',ql:'عضلة عميقة في أسفل الظهر تثني الجذع جانبيًا وتثبّت الحوض.','glute-deep':'تقع تحت الألوية الكبرى. تبعد الورك وتديره وتحافظ على توازن الحوض أثناء المشي.',soleus:'تقع تحت التوأمية. تبقيك منتصبًا وتدفع المشي والجري.'});
+Object.assign(SEC,{'pec-minor':['serratus'],serratus:['pec-minor'],'bicep-s':['bicep-l','brachialis','coraco'],'bicep-l':['bicep-s','brachialis'],brachialis:['bicep-s','bicep-l'],coraco:['bicep-s'],'tri-long':['tri-lat','tri-med'],'tri-lat':['tri-long','tri-med'],'tri-med':['tri-long','tri-lat'],rhomb:['traps','infra'],supra:['infra','delt-r'],infra:['supra','rotator'],ql:['lowback'],'glute-deep':['glutes'],soleus:['calves'],'vast-int':['quads'],psoas:['hipflex','abs'],'int-obl':['abs','obliques'],'adductors-d':['adductors'],'forearm-deep':['forearms','biceps']});
+/* ---------- skeleton mode ---------- */
+let skel=false;
+Object.assign(INFO,{
+skull:['Skull','Protects the brain and anchors the muscles of the face and jaw.'],
+mandible:['Mandible','The only movable bone of the skull. Opens and closes the mouth for chewing and speech.'],
+clavicle:['Clavicle','Collarbone. Braces the shoulder away from the chest and transmits force to the trunk.'],
+scapula:['Scapula','Shoulder blade. Glides over the ribs and forms the socket of the shoulder joint.'],
+ribs:['Ribs (thorax)','Twelve pairs of ribs that shield the heart and lungs and lift to draw air in.'],
+sternum:['Sternum','Breastbone. The central anchor where the ribs and collarbones meet.'],
+spine:['Spine','Stack of 33 vertebrae that protect the spinal cord and let the trunk bend and twist.'],
+pelvis:['Pelvis','Transfers weight between the spine and legs and holds the hip sockets.'],
+humerus:['Humerus','Upper arm bone. Lever for the shoulder and elbow.'],
+ulna:['Ulna','Forearm bone on the little finger side. Forms the hinge of the elbow.'],
+radius:['Radius','Forearm bone on the thumb side. Rolls around the ulna to turn the palm.'],
+hand:['Hand (carpals, metacarpals, phalanges)','Twenty-seven small bones that give the hand its grip and fine control.'],
+femur:['Femur','Thigh bone. The longest and strongest bone in the body.'],
+patella:['Patella','Kneecap. Acts as a pulley that boosts the quadriceps.'],
+tibia:['Tibia','Shin bone. Carries most of the body weight below the knee.'],
+fibula:['Fibula','Slim outer shin bone. Stabilises the ankle and anchors muscles.'],
+foot:['Foot (tarsals, metatarsals, phalanges)','Twenty-six bones that form the arch and absorb impact.']});
+(()=>{const S='Sagittal plane',F='Frontal plane',T='Transverse plane',FA='Frontal axis',SA='Sagittal axis',VA='Vertical axis',LA='Longitudinal axis';
+Object.assign(PA,{
+skull:[['Neck extension',S,FA],['Head rotation',T,VA]],
+mandible:[['Jaw closing (masseter)',S,FA]],
+clavicle:[['Scapular upward rotation',F,SA],['Scapular retraction (glide)',T,VA]],
+scapula:[['Scapular upward rotation',F,SA],['Scapular retraction (glide)',T,VA]],
+ribs:[['Rib elevation (breathing)',S,FA]],
+spine:[['Trunk flexion',S,FA],['Trunk extension',S,FA],['Trunk rotation',T,VA],['Lateral flexion',F,SA]],
+pelvis:[['Posterior pelvic tilt',S,FA],['Hip flexion',S,FA]],
+humerus:[['Shoulder flexion',S,FA],['Shoulder adduction',F,SA],['Shoulder external rotation',T,VA]],
+ulna:[['Elbow flexion',S,FA],['Elbow extension',S,FA]],
+radius:[['Forearm supination',T,LA],['Pronation',T,LA]],
+hand:[['Wrist flexion and extension',S,FA],['Radial and ulnar deviation',F,SA]],
+femur:[['Hip flexion',S,FA],['Hip extension',S,FA],['Hip adduction',F,SA]],
+patella:[['Knee extension',S,FA]],
+tibia:[['Knee flexion',S,FA],['Knee extension',S,FA]],
+fibula:[['Inversion and eversion (approx.)',F,SA]],
+foot:[['Ankle plantarflexion',S,FA],['Dorsiflexion (shin)',S,FA],['Inversion and eversion (approx.)',F,SA]]});})();
+Object.assign(ARN,{'Skeleton':'الهيكل العظمي','Head rotation':'دوران الرأس','Rib elevation (breathing)':'رفع الأضلاع (التنفس)','Skull':'الجمجمة','Mandible':'الفك السفلي','Clavicle':'الترقوة','Scapula':'لوح الكتف','Ribs (thorax)':'الأضلاع (القفص الصدري)','Sternum':'عظم القص','Spine':'العمود الفقري','Pelvis':'الحوض','Humerus':'عظم العضد','Ulna':'عظم الزند','Radius':'عظم الكعبرة','Hand (carpals, metacarpals, phalanges)':'اليد (الرسغ، مشط اليد، السلاميات)','Femur':'عظم الفخذ','Patella':'الرضفة','Tibia':'عظم القصبة','Fibula':'عظم الشظية','Foot (tarsals, metatarsals, phalanges)':'القدم (الرسغ، مشط القدم، السلاميات)'});
+Object.assign(ARD,{skull:'تحمي الدماغ وتثبّت عضلات الوجه والفك.',mandible:'العظم المتحرك الوحيد في الجمجمة. يفتح الفم ويغلقه للمضغ والكلام.',clavicle:'عظم الترقوة. يبعد الكتف عن الصدر وينقل القوة إلى الجذع.',scapula:'لوح الكتف. ينزلق فوق الأضلاع ويشكل تجويف مفصل الكتف.',ribs:'اثنا عشر زوجًا من الأضلاع تحمي القلب والرئتين وترتفع لإدخال الهواء.',sternum:'عظم الصدر. نقطة الارتكاز المركزية التي تلتقي عندها الأضلاع والترقوتان.',spine:'مكوّن من 33 فقرة تحمي الحبل الشوكي وتتيح للجذع الانحناء والدوران.',pelvis:'ينقل الوزن بين العمود الفقري والساقين ويحمل تجاويف الورك.',humerus:'عظم الذراع العلوي. ذراع رافعة للكتف والمرفق.',ulna:'عظم الساعد من جهة الخنصر. يشكل مفصلة المرفق.',radius:'عظم الساعد من جهة الإبهام. يدور حول الزند لقلب الكف.',hand:'سبعة وعشرون عظمًا صغيرًا تمنح اليد القبضة والتحكم الدقيق.',femur:'عظم الفخذ. أطول وأقوى عظم في الجسم.',patella:'غطاء الركبة. يعمل كبكرة تعزز قوة العضلة رباعية الرؤوس.',tibia:'عظم الساق. يحمل معظم وزن الجسم تحت الركبة.',fibula:'عظم الساق الخارجي الرفيع. يثبّت الكاحل وتتصل به العضلات.',foot:'ستة وعشرون عظمًا تشكل القوس وتمتص الصدمات.'});
+const rb=i=>{const y=132+i*13,rx=[166,158,152,148,146,148,152,158,166,174][i];return `M192,${y}C${rx+16},${y-10} ${rx-2},${y+4} ${rx},${y+26}C${rx+8},${y+22} ${rx+24},${y+10} 192,${y+9}Z`};
+const dg=(x,y,ex,ey)=>`M${x-2},${y}L${x+2},${y}L${ex+1.5},${ey}L${ex-1.5},${ey}Z`;
+const vt=(y,w,h)=>`M${200-w/2},${y}h${w}v${h}h${-w}z`;
+const spn=[...Array(6)].map((_,i)=>vt(86+i*5,10,4.5)).concat([...Array(12)].map((_,i)=>vt(116+i*13,14,11)),[...Array(5)].map((_,i)=>vt(288+i*11,19,10)));
+const SKL=[
+['scapula',['M142,128L126,132C116,140 112,160 114,184L128,172C134,158 140,144 146,134Z']],
+['ribs',[0,1,2,3,4,5,6,7,8,9].map(rb)],
+['clavicle',['M198,120C182,114 160,118 142,128L144,134C162,126 182,122 196,128Z']],
+['pelvis',['M198,342C176,326 146,328 132,344C126,362 134,382 150,394L168,402L184,424L198,428Z']],
+['femur',['M156,392C144,388 134,396 136,408C136,414 140,418 146,420C146,456 148,486 148,508L142,518L182,518L176,508C174,484 172,452 168,422C166,408 166,396 156,392Z']],
+['humerus',['M124,134C112,134 106,146 110,158L98,298L112,302L126,166C134,160 138,146 124,134Z','M118,142a10,10 0 1,0 20,0a10,10 0 1,0 -20,0Z']],
+['radius',['M94,304C98,306 100,312 98,318L74,394L66,390L90,320C90,312 90,308 94,304Z']],
+['ulna',['M104,298L110,304L88,394L80,392Z']],
+['hand',['M64,392L86,396L88,410L62,408Z',dg(66,410,58,468),dg(72,411,66,476),dg(78,411,76,474),dg(84,410,90,462),dg(88,400,101,424)]],
+['patella',['M151,528a9,10 0 1,0 18,0a9,10 0 1,0 -18,0Z']],
+['tibia',['M144,534L180,534L176,546C174,592 172,640 170,692L160,696L156,692C154,640 152,592 150,546Z']],
+['fibula',['M138,538L146,540C146,590 148,640 150,686L142,692C140,640 138,590 138,538Z']],
+['foot',['M146,694L174,694L176,704L144,704Z',...[142,150,158,166,174].map(x=>`M${x},704L${x+5},704L${x+4},716L${x-1},716Z`)]]];
+const SKC=[
+['spine',spn],
+['sternum',['M200,124L192,126L190,140L192,180L200,196L208,180L210,140L208,126Z']],
+['skull',['M178,52C178,30 190,22 200,22C210,22 222,30 222,52C222,60 219,66 215,70L214,78L186,78L185,70C181,66 178,60 178,52Z']],
+['mandible',['M186,76L214,76L213,90C209,98 191,98 187,90Z']],
+['pelvis',['M186,344L214,344L208,388L200,404L192,388Z']]];
+const bone=(id,ps,m)=>`<g class='m bn' data-m='${id}' ${m?`aria-hidden='true'`:`tabindex='0' role='button' aria-label='${INFO[id][0]}'`}>`+ps.map(d=>`<path class='mb' d='${d}'/>`).join('')+'</g>';
+const bl=(L,m)=>L.map(([id,ps])=>bone(id,ps,m)).join('');
+document.getElementById('skel').innerHTML=`<g data-vw='s'><g>${bl(SKL,false)}</g><g transform='translate(400,0) scale(-1,1)'>${bl(SKL,true)}</g><g>${bl(SKC,false)}<circle class='sock' cx='191' cy='52' r='5.5'/><circle class='sock' cx='209' cy='52' r='5.5'/><path class='sock' d='M200,58L197,66L203,66Z'/></g></g>`;
+/* ---------- realistic skeleton (overrides the first draft) ---------- */
+document.querySelector('#fig defs').insertAdjacentHTML('beforeend',`<linearGradient id='gb' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='#8a7c5c'/><stop offset='.28' stop-color='#e6d9b8'/><stop offset='.5' stop-color='#f4ebd2'/><stop offset='.78' stop-color='#cfc09c'/><stop offset='1' stop-color='#857758'/></linearGradient>`);
+const cr=(P,n=7)=>{const o=[];for(let i=0;i<P.length-1;i++){const p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||P[i+1];for(let t=0;t<n;t++){const s=t/n,s2=s*s,s3=s2*s;o.push([0,1].map(k=>.5*(2*p1[k]+(-p0[k]+p2[k])*s+(2*p0[k]-5*p1[k]+4*p2[k]-p3[k])*s2+(-p0[k]+3*p1[k]-3*p2[k]+p3[k])*s3)))}}o.push(P[P.length-1]);return o};
+const band=(P,w0,w1,wm)=>{const Q=cr(P),N=Q.length,L=[],R=[];Q.forEach((p,i)=>{const a=Q[Math.max(0,i-1)],b=Q[Math.min(N-1,i+1)];let dx=b[0]-a[0],dy=b[1]-a[1];const l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;const u=i/(N-1),w=(w0+(w1-w0)*u)*(1+(wm||0)*Math.sin(Math.PI*u))/2;L.push([p[0]-dy*w,p[1]+dx*w]);R.push([p[0]+dy*w,p[1]-dx*w])});const f=a=>a.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L');return 'M'+f(L)+'L'+f(R.reverse())+'Z'};
+const el=(x,y,rx,ry)=>`M${x-rx},${y}a${rx},${ry} 0 1,0 ${2*rx},0a${rx},${ry} 0 1,0 ${-2*rx},0Z`;
+const rrect=(x,y,w,h,r)=>`M${x+r},${y}h${w-2*r}q${r},0 ${r},${r}v${h-2*r}q0,${r} ${-r},${r}h${-(w-2*r)}q${-r},0 ${-r},${-r}v${-(h-2*r)}q0,${-r} ${r},${-r}z`;
+const fing=(x,y,deg,segs,ws)=>{const a=deg*Math.PI/180,ux=Math.sin(a),uy=Math.cos(a),nx=uy,ny=-ux;let px=x,py=y;return segs.map((l,i)=>{const w=ws[i]*1.35,q=(t,s)=>[(px+ux*l*t+nx*w*s).toFixed(1),(py+uy*l*t+ny*w*s).toFixed(1)].join(',');const d=`M${q(0,.62)}L${q(.18,.4)}L${q(.82,.4)}L${q(1,.62)}L${q(1,-.62)}L${q(.82,-.4)}L${q(.18,-.4)}L${q(0,-.62)}Z`;px+=ux*(l+1.2);py+=uy*(l+1.2);return d})};
+const RIB=[],XL=[36,46,53,58,61,62,61,58,54,48,40,32];
+for(let i=0;i<12;i++){const yp=127+i*12.2,xl=200-XL[i];let P;
+ if(i<7){const ys=128+i*10,xa=200-[16,22,26,30,33,35,37][i],ya=ys+8+(i?0:4);P=i?[[193,yp],[xl+14,yp+1],[xl,yp+14+i],[xl+8,yp+28+i*1.4],[xa,ya]]:[[193,yp+1],[xl+16,yp-2],[xl,yp+8],[xa+4,ya]];RIB.push(band(P,4.2,2.6,.1),'c:'+band([[xa,ya],[(xa+196)/2,ys+3],[195,ys]],3,3))}
+ else if(i<10){const xa=200-[40,36,30][i-7],ya=yp+28+i;RIB.push(band([[193,yp],[xl+14,yp+2],[xl,yp+15],[xl+10,yp+27],[xa,ya]],4,2.6,.1),'c:'+band([[xa,ya],[xa+6,ya-8],[198,190]],2.6,2.6))}
+ else RIB.push(band([[193,yp],[xl+16,yp+2],[xl+2,yp+12],[xl+6,yp+24]],3.6,2.2,.1))}
+const VT=['v:M193,88h14v260h-14z'];
+for(let i=0;i<24;i++){let y,w,h,tp;if(i<7){y=90+i*6.4;w=8+i*.7;h=5;tp=4}else if(i<19){y=136+(i-7)*13;w=12+(i-7)*.5;h=10;tp=5}else{y=294+(i-19)*10.5;w=18;h=9;tp=9}
+ VT.push(rrect(200-w/2,y,w,h,1.6),`M${200-w/2},${y+h*.3}l${-tp},-1v2.4l${tp},1z`,`M${200+w/2},${y+h*.3}l${tp},-1v2.4l${-tp},1z`)}
+const K=[[74,398],[80,396],[86,397],[91,400],[72,405],[78,404],[84,403],[90,406]].map(p=>el(p[0],p[1],3.8,3.3));
+const HAND=[...K,...fing(73,408,-30,[26,14,9,8],[3.2,3,2.6,2.3]),...fing(79,409,-20,[27,15,10,8],[3.2,3,2.6,2.3]),...fing(85,409,-10,[25,14,9,8],[3.2,3,2.6,2.3]),...fing(91,407,0,[22,10,7,7],[3,2.8,2.4,2.2]),...fing(67,402,-52,[18,12,9],[3.6,3.2,2.8])];
+const FOOT=['M149,700C152,696 166,696 169,700L170,708L148,708Z','M146,708L172,708L176,716L142,716Z','d:M152,708L152,716M158,708L158,716M165,708L166,716',...[[148,143],[153,151],[158,159],[163,167],[169,176]].map(([b,e])=>`M${b-1.4},716L${b+1.4},716L${e+1.2},727L${e-1.2},727Z`)];
+const SK2L=[
+['scapula',['M139,124L129,128C125,142 126,168 131,190L140,184C144,170 146,152 146,136C144,132 141,128 139,124Z','M146,128L150,123L154,128Z','d:M131,186C127,160 128,142 131,132']],
+['humerus',['M130,132C138,132 142,140 140,147C139,151 136,154 133,157L131,166C129,200 124,250 121,282C124,286 126,292 125,298C120,302 108,304 100,300C98,294 100,288 104,284C108,250 114,200 118,166L116,158C113,154 111,150 111,145C111,137 119,132 130,132Z','h:M124,166C122,206 118,250 115,282','d:M130,170C128,206 124,250 121,280']],
+['ribs',RIB],
+['clavicle',[band([[196,123],[184,119],[168,121],[152,126],[140,123]],6,6,-.25),'h:M190,121C176,118 160,122 146,125']],
+['pelvis',['M196,338C182,326 158,326 140,334C131,339 127,348 129,357C131,366 137,373 146,378C142,385 141,393 143,401C146,411 154,418 162,421C164,430 168,440 176,447C183,450 189,444 190,438L194,428L200,420L200,414L196,408C190,396 186,384 188,372L190,356Z','k:M168,426C165,433 167,441 172,443C177,443 179,437 177,430Z','d:M143,398a10,10 0 1,0 20,0a10,10 0 1,0 -20,0Z','d:M146,380C160,372 176,372 188,380','h:M190,334C172,328 152,329 138,336'],'translate(200 0) scale(.94 1) translate(-200 0)'],
+['femur',['M153,389C159,389 163,394 162,400C161,405 158,408 157,412L158,424C159,450 163,482 166,506C168,512 173,516 172,524C170,531 154,531 150,526C148,520 148,514 146,506C142,482 141,452 140,428C136,426 132,420 133,412C134,407 139,406 143,404C143,398 144,392 148,390C150,389 151,389 153,389Z','h:M150,432C150,462 153,490 156,508','d:M161,516L161,530']],
+['radius',['M102,302C108,300 112,304 110,310L108,318L80,386C79,392 78,396 72,394C68,392 68,388 70,384L96,316C98,310 98,306 102,302Z','h:M104,312L76,388']],
+['ulna',['M114,296C120,296 124,300 123,306L122,312L92,392C90,396 88,398 84,396C82,392 84,388 86,386L108,318C110,310 110,302 114,296Z','h:M118,306L88,388']],
+['hand',HAND],
+['patella',['M153,528C150,534 150,543 156,548C162,550 168,546 168,538C168,531 162,526 153,528Z','d:M156,533C158,531 163,532 164,537']],
+['tibia',['M146,536C152,532 170,532 178,536C180,542 177,548 174,552L170,560C169,600 168,650 168,690C168,696 170,698 170,702L158,704C156,700 156,696 154,690C152,650 150,600 150,560L146,552C144,546 144,540 146,536Z','h:M160,560C159,600 159,650 160,692','d:M159,552C160,556 161,560 161,564']],
+['fibula',['M134,548C136,544 144,544 146,548L148,560C148,600 148,650 150,690L148,704C144,706 140,704 140,698C140,650 140,600 138,560Z']],
+['foot',FOOT]];
+const SK2C=[
+['spine',VT],
+['sternum',['M189,125C194,122 206,122 211,125L212,134L207,142L206,190L200,203L194,190L193,142L188,134Z','d:M193,141L207,141','d:M196,124C199,127 201,127 204,124']],
+['skull',['M172,50C172,29 184,18 200,18C216,18 228,29 228,50C228,57 226,62 223,66L220,72C219,80 215,88 211,92L189,92C185,88 181,80 180,72L177,66C174,62 172,57 172,50Z','k:M183,58a6,5 0 1,0 12,0a6,5 0 1,0 -12,0Z','k:M205,58a6,5 0 1,0 12,0a6,5 0 1,0 -12,0Z','k:M200,61C197,65 196,70 198,75L200,73L202,75C204,70 203,65 200,61Z','t:M190,88L210,88L209,92L191,92Z','d:M200,88L200,92','d:M181,52C185,43 215,43 219,52','d:M180,62C179,68 182,72 187,73','d:M220,62C221,68 218,72 213,73','h:M186,24C192,19 208,19 214,24']],
+['mandible',['M180,80C180,92 186,102 194,106L206,106C214,102 220,92 220,80L216,80C216,90 211,98 206,101L194,101C189,98 184,90 184,80Z','t:M192,96L208,96L207,100L193,100Z']],
+['pelvis',['M186,338L214,338C214,356 210,380 204,398L200,410L196,398C190,380 186,356 186,338Z','M196,410L204,410L202,424L198,424Z','k:M192,352a1.3,1.3 0 1,0 2.6,0a1.3,1.3 0 1,0 -2.6,0Z','k:M205.4,352a1.3,1.3 0 1,0 2.6,0a1.3,1.3 0 1,0 -2.6,0Z','k:M194,364a1.3,1.3 0 1,0 2.6,0a1.3,1.3 0 1,0 -2.6,0Z','k:M203.4,364a1.3,1.3 0 1,0 2.6,0a1.3,1.3 0 1,0 -2.6,0Z','k:M196,376a1.2,1.2 0 1,0 2.4,0a1.2,1.2 0 1,0 -2.4,0Z','k:M201.6,376a1.2,1.2 0 1,0 2.4,0a1.2,1.2 0 1,0 -2.4,0Z']]];
+const PCL={k:'sock',d:'dl',h:'hl',t:'tooth',c:'mb cart',v:'disc'};
+const pth=d=>{const m=/^([a-z]):/.exec(d);return m?`<path class='${PCL[m[1]]}' d='${d.slice(2)}'/>`:`<path class='mb' d='${d}'/>`};
+const bn2=(id,ps,m,tf)=>`<g class='m bn' data-m='${id}' ${tf?`transform='${tf}' `:''}${m?`aria-hidden='true'`:`tabindex='0' role='button' aria-label='${INFO[id][0]}'`}>`+ps.map(pth).join('')+'</g>';
+const bl2=(L,m)=>L.map(([id,ps,tf])=>bn2(id,ps,m,tf)).join('');
+document.getElementById('skel').innerHTML=`<g data-vw='s'><g>${bl2(SK2L,false)}</g><g transform='translate(400,0) scale(-1,1)'>${bl2(SK2L,true)}</g><g>${bl2(SK2C,false)}</g></g>`;
+/* ---------- skeleton back view ---------- */
+const pick=id=>SK2L.find(e=>e[0]===id),nod=a=>a.filter(d=>!/^[a-z]:/.test(d));
+const RIBB=[...Array(12)].map((_,i)=>{const yp=127+i*12.2,xl=200-XL[i];return band([[193,yp],[xl+16,yp+4],[xl,yp+16+i*.4],[xl+2,yp+26]],4.4,3,.08)});
+const VTB=['v:M194,88h12v260h-12z'];
+for(let i=0;i<24;i++){let y,w,h,tp,sp;if(i<7){y=90+i*6.4;w=8+i*.7;h=5;tp=4;sp=3}else if(i<19){y=136+(i-7)*13;w=12+(i-7)*.5;h=10;tp=5;sp=7}else{y=294+(i-19)*10.5;w=18;h=9;tp=9;sp=4}
+ VTB.push(rrect(200-w*.4,y,w*.8,h,1.5),`M198.6,${y+h*.5}L201.4,${y+h*.5}L201,${y+h+sp}L199,${y+h+sp}Z`,`M${200-w*.4},${y+h*.3}l${-tp-1},0v2.6l${tp+1},0z`,`M${200+w*.4},${y+h*.3}l${tp+1},0v2.6l${-tp-1},0z`)}
+const hipB=pick('pelvis'),fB=pick('femur');
+const SK3L=[
+ ['ribs',RIBB],
+ pick('clavicle'),
+ ['scapula',['M180,130L184,150L180,176L168,206C158,204 148,192 142,170C138,160 138,152 140,146L130,126C136,122 148,130 160,138C168,136 174,132 180,130Z','d:M184,148L134,128','h:M178,140L170,200']],
+ pick('humerus'),pick('radius'),pick('ulna'),pick('hand'),
+ ['pelvis',nod(hipB[1]).concat(['d:M142,346C152,356 164,364 176,368','d:M148,338C160,350 172,358 184,362','k:M150,388C146,394 148,402 154,406','h:M190,334C172,328 152,329 138,336']),hipB[2]],
+ ['femur',nod(fB[1]).concat(['d:M152,428C153,460 156,490 158,508','d:M155,518L155,530','h:M147,432C147,462 150,490 152,508'])],
+ pick('tibia'),pick('fibula'),
+ ['foot',['M146,690C146,704 150,722 158,727C166,727 172,718 172,704L168,690Z','d:M156,696C157,706 158,716 158,724','h:M150,700C150,710 152,718 155,724']]];
+const SK3C=[
+ ['spine',VTB],
+ ['skull',['M172,52C172,30 184,18 200,18C216,18 228,30 228,52C228,66 222,78 214,84C210,88 205,90 200,90C195,90 190,88 186,84C178,78 172,66 172,52Z','M172,66C170,72 172,78 176,80L178,72Z','M228,66C230,72 228,78 224,80L222,72Z','d:M200,18L200,70','d:M200,32L184,56L186,72','d:M200,32L216,56L214,72','d:M194,76C197,72 203,72 206,76','h:M186,24C192,19 208,19 214,24']],
+ ['pelvis',['M186,338L214,338C216,358 212,384 206,402L200,420L194,402C188,384 184,358 186,338Z','M196,420L204,420L202,436L198,436Z','d:M200,342L200,408','k:M191,354a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0Z','k:M205.8,354a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0Z','k:M193,368a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0Z','k:M204,368a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0Z','k:M195,382a1.4,1.4 0 1,0 2.8,0a1.4,1.4 0 1,0 -2.8,0Z','k:M202.2,382a1.4,1.4 0 1,0 2.8,0a1.4,1.4 0 1,0 -2.8,0Z']]];
+document.getElementById('skel').innerHTML=`<g data-vw='s'><g>${bl2(SK2L,false)}</g><g transform='translate(400,0) scale(-1,1)'>${bl2(SK2L,true)}</g><g>${bl2(SK2C,false)}</g></g><g data-vw='sb' transform='translate(400,0)'><g>${bl2(SK3L,false)}</g><g transform='translate(400,0) scale(-1,1)'>${bl2(SK3L,true)}</g><g>${bl2(SK3C,false)}</g></g>`;
+document.getElementById('sk').onclick=()=>{skel=!skel;cancelAnimationFrame(raf);sel=null;
+ document.getElementById('views').style.display=skel?'none':'';document.getElementById('skel').style.display=skel?'':'none';
+ document.querySelector('.legend').style.display=skel?'none':'';
+ document.getElementById('sk').setAttribute('aria-pressed',skel);
+ home=VB[curV].split(' ').map(Number);setVB(home.slice());applyLang()};
+document.getElementById('lang').onclick=()=>{lang=lang==='ar'?'en':'ar';applyLang()};
+paint();
+</script>
+</body>
+</html>
