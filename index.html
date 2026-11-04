@@ -357,7 +357,7 @@ const zr=document.getElementById('zr');zr.onclick=()=>resetZoom();
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sel)resetZoom()});
 const fig=document.getElementById('fig'),info=document.getElementById('info');
 const SEC={chest:['delt-f','triceps'],'delt-f':['chest','triceps','traps'],'delt-r':['lats','traps','rotator','triceps'],traps:['delt-r','rotator','lats'],lats:['biceps','delt-r','rotator','forearms'],biceps:['forearms','lats'],triceps:['chest','delt-f'],forearms:['biceps'],abs:['obliques','hipflex'],obliques:['abs','lowback'],lowback:['glutes','hams','traps'],glutes:['hams','quads','lowback','adductors'],quads:['glutes','calves','hipflex'],adductors:['glutes','quads'],hams:['glutes','calves','lowback'],calves:['hams','quads'],sartorius:['hipflex','quads'],hipflex:['quads','abs','sartorius'],rotator:['delt-r','traps','lats']};
-function role(id){return id===sel?'p':(SEC[sel]||[]).includes(id)?'s':''}
+function role(id){return id===sel?'p':(SEC[sel]||[]).includes(id)||(JM[sel]||[]).includes(id)?'s':''}
 function paint(){
   
   fig.querySelectorAll('.m').forEach(el=>{const r=role(el.dataset.m);
@@ -368,7 +368,7 @@ function paint(){
   const r=role(sel),[n0,t0]=INFO[sel],n=T(n0),t=lang==='ar'&&ARD[sel]||t0;
   const tag='';
   const sl=(SEC[sel]||[]);
-  info.innerHTML=`<b>${n}</b><span class="tag" style="background:var(--pri);color:#fff">${T(JT[sel]?'Joint':'Primary')}</span><p>${t}</p>`+(ANT[sel]?`<p class="sm">${T('Opposed by')} ${T(ANT[sel])}</p>`:'')+jx(sel)+mv(sel)+(sl.length?`<span class="tag" style="background:var(--sec);color:#111">${T(JT[sel]?'Connects':'Secondary')}</span>`+sl.map(i=>`<p class="sm">${T(INFO[i][0])}</p>`).join(''):'');
+  info.innerHTML=`<b>${n}</b><span class="tag" style="background:var(--pri);color:#fff">${T(JT[sel]?'Joint':'Primary')}</span><p>${t}</p>`+(ANT[sel]?`<p class="sm">${T('Opposed by')} ${T(ANT[sel])}</p>`:'')+jx(sel)+mv(sel)+(sl.length?`<span class="tag" style="background:var(--sec);color:#111">${T(JT[sel]?'Connects':'Secondary')}</span>`+sl.map(i=>`<p class="sm">${T(INFO[i][0])}</p>`).join(''):'')+jmv(sel);
   [...info.children].forEach((c,i)=>c.style.setProperty('--i',i));
 }
 
@@ -630,8 +630,13 @@ const JT={};
 Object.assign(ARN,{'Joint':'مفصل','Connects':'يربط بين','Joint type':'نوع المفصل','Synovial ball-and-socket':'مفصل زلالي كروي (كرة وحق)','Synovial hinge':'مفصل زلالي مفصلي (مفصلة)','Synovial pivot':'مفصل زلالي محوري','Synovial ellipsoid (condyloid)':'مفصل زلالي إهليجي (لقمي)','Synovial saddle':'مفصل زلالي سرجي','Synovial gliding (plane)':'مفصل زلالي انزلاقي (مستوي)','Synovial modified hinge':'مفصل زلالي مفصلي معدّل','Cartilaginous (disc)':'مفصل غضروفي (قرص)','Cartilaginous (pubic symphysis)':'مفصل غضروفي (ارتفاق)','Jaw side-to-side glide':'انزلاق الفك جانبيًا','Clavicle elevation and depression':'رفع وخفض الترقوة','Clavicle protraction and retraction':'دفع وسحب الترقوة','Shoulder abduction':'إبعاد الكتف','Hip abduction':'إبعاد الورك','Hip internal rotation':'دوران الورك للداخل','Finger spreading (abduction)':'تباعد الأصابع','Slight nutation and counternutation':'حركة طفيفة للعجز (إيماء وإيماء عكسي)','Knee rotation (when flexed)':'دوران الركبة (عند الثني)','Head nodding (flexion)':'إيماء الرأس (ثني)','Head tilt (side bending)':'ميل الرأس جانبيًا'});
 JD.forEach(j=>{INFO[j.id]=[j.n,j.d];ARN[j.n]=j.a;ARD[j.id]=j.ad;if(j.m.length)PA[j.id]=j.m;SEC[j.id]=j.b;JT[j.id]=j.ty});
 function jx(id){return JT[id]?`<span class="tag" style="background:#3a3a3f;color:#fff">${T('Joint type')}</span><p class="sm">${T(JT[id])}</p>`:''}
-const jm=(j,x,m)=>`<g class='m jt' data-m='${j.id}' ${m?`aria-hidden='true'`:`tabindex='0' role='button' aria-label='${j.n}'`}><circle cx='${x}' cy='${j.y}' r='7' fill='rgba(0,0,0,0)'/><circle class='jc' cx='${x}' cy='${j.y}' r='3.6'/></g>`;
+const jm=(j,x,m)=>`<g class='m jt' data-m='${j.id}' ${m?`aria-hidden='true'`:`tabindex='0' role='button' aria-label='${j.n}'`}><circle cx='${x}' cy='${j.y}' r='5' fill='rgba(0,0,0,0)'/><circle class='jc' cx='${x}' cy='${j.y}' r='3.6'/></g>`;
 const jl=m=>JD.filter(j=>j.p).map(j=>jm(j,j.x,m)).join(''),jc=()=>JD.filter(j=>!j.p).map(j=>jm(j,j.x,false)).join('');
+const JM={'j-tmj':['face'],'j-sc':['traps','chest'],'j-ac':['traps','delt-f','delt-r'],'j-gh':['delt-f','delt-r','chest','lats','rotator','supra','infra','coraco'],'j-elbow':['biceps','brachialis','triceps','tri-long','tri-lat','tri-med','bicep-s','bicep-l'],'j-pru':['biceps','forearms','forearm-deep'],'j-wrist':['forearms','forearm-deep'],'j-mcp':['forearms','forearm-deep'],'j-ip':['forearm-deep'],'j-hip':['glutes','hipflex','psoas','adductors','adductors-d','quads','hams','glute-deep','sartorius'],'j-si':['lowback','glutes','ql'],'j-knee':['quads','vast-int','hams','calves'],'j-ankle':['calves','soleus'],'j-subtalar':['calves'],'j-mtp':['calves'],'j-ao':['traps'],'j-aa':['traps'],'j-lsj':['lowback','abs','ql'],'j-ps':[]};
+Object.assign(ARN,{'Moved by':'العضلات المحركة'});
+function jmv(id){const a=JM[id]||[];return a.length?`<span class="tag" style="background:var(--sec);color:#111">${T('Moved by')}</span>`+a.map(i=>`<p class="sm">${T(INFO[i][0])}</p>`).join(''):''}
+document.querySelectorAll('#views [data-vw]').forEach(g=>{const back=g.dataset.vw==='b',ok=j=>!back||!['j-ps','j-sc'].includes(j.id);
+ g.insertAdjacentHTML('beforeend',`<g>${JD.filter(j=>j.p&&ok(j)).map(j=>jm(j,j.x,false)).join('')}</g><g transform='translate(400,0) scale(-1,1)'>${JD.filter(j=>j.p&&ok(j)).map(j=>jm(j,j.x,true)).join('')}</g><g>${JD.filter(j=>!j.p&&ok(j)).map(j=>jm(j,j.x,false)).join('')}</g>`)});
 const HIPB=`<g class='bn' style='pointer-events:none' transform='${TF}'><path class='mb' d='${hipB[1][0]}'/></g>`;
 document.getElementById('skel').innerHTML=`<g data-vw='s'><g>${HIPB}${bl2(SK4L,false)}</g><g transform='translate(400,0) scale(-1,1)'>${HIPB}${bl2(SK4L,true)}</g><g>${BASEF}${bl2(SK4C,false)}${SOCKF}${dt('s',false)}</g><g>${jl(false)}</g><g transform='translate(400,0) scale(-1,1)'>${jl(true)}</g><g>${jc()}</g></g><g data-vw='sb' transform='translate(400,0)'><g>${HIPB}${bl2(SK4BL,false)}</g><g transform='translate(400,0) scale(-1,1)'>${HIPB}${bl2(SK4BL,true)}</g><g>${BASEB}${bl2(SK4BC,false)}${dt('s',false)}</g><g>${jl(false)}</g><g transform='translate(400,0) scale(-1,1)'>${jl(true)}</g><g>${jc()}</g></g>`;
 document.getElementById('sk').onclick=()=>{skel=!skel;cancelAnimationFrame(raf);sel=null;
