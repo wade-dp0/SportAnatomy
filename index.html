@@ -64,6 +64,10 @@ svg{display:block;width:100%;height:auto;max-height:78vh;margin:0 auto;overflow:
 .dl{fill:none;stroke:#5e5238;stroke-width:.6;opacity:.65;pointer-events:none;stroke-linecap:round}
 .hl{fill:none;stroke:#fffaf0;stroke-width:.8;opacity:.6;pointer-events:none;stroke-linecap:round}
 .tooth{fill:#f7f5ec;stroke:#8d8470;stroke-width:.4;pointer-events:none}
+.jt{cursor:pointer}
+.jc{fill:rgba(255,255,255,.14);stroke:#ff8a80;stroke-width:1.1;pointer-events:none;transition:fill .2s}
+.jt:hover .jc{fill:rgba(255,138,128,.5)}
+.m.jt.p .jc{fill:#e8372f;stroke:#fff}
 .sock{fill:#15151a;pointer-events:none}
 .lg svg{display:block}
 .by{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));font:400 15px 'Mako Kaiju','Mako',sans-serif;color:var(--mute);letter-spacing:.04em;pointer-events:none;z-index:5}
@@ -260,7 +264,7 @@ function setVB(a){vb=a;fig.setAttribute('viewBox',a.join(' '))}
 function animVB(to){cancelAnimationFrame(raf);const D=matchMedia('(prefers-reduced-motion:reduce)').matches?0:650;if(!D){setVB(to);return}
  const from=vb.slice(),t0=performance.now();(function s(t){let k=Math.min(1,(t-t0)/D);k=k<.5?4*k*k*k:1-Math.pow(-2*k+2,3)/2;setVB(from.map((v,i)=>v+(to[i]-v)*k));if(k<1)raf=requestAnimationFrame(s)})(t0)}
 function zoomTo(g){const vw=g.closest('[data-vw]'),id=g.dataset.m,inv=fig.getScreenCTM().inverse();let x0=1e9,y0=1e9,x1=-1e9,y1=-1e9;
- vw.querySelectorAll(`.m[data-m='${id}'],.dt[data-d='${id}']`).forEach(e=>{const r=e.getBoundingClientRect();[[r.left,r.top],[r.right,r.bottom]].forEach(([x,y])=>{const p=new DOMPoint(x,y).matrixTransform(inv);x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x);y1=Math.max(y1,p.y)})});
+ (g.classList.contains('jt')?[g]:vw.querySelectorAll(`.m[data-m='${id}'],.dt[data-d='${id}']`)).forEach(e=>{const r=e.getBoundingClientRect();[[r.left,r.top],[r.right,r.bottom]].forEach(([x,y])=>{const p=new DOMPoint(x,y).matrixTransform(inv);x0=Math.min(x0,p.x);y0=Math.min(y0,p.y);x1=Math.max(x1,p.x);y1=Math.max(y1,p.y)})});
  const ar=home[2]/home[3],pd=12;let w=Math.max(x1-x0+2*pd,90),h=y1-y0+2*pd;if(w/h>ar)h=w/ar;else w=h*ar;w=Math.min(w,home[2]);h=w/ar;
  animVB([(x0+x1)/2-w/2,(y0+y1)/2-h/2,w,h])}
 function resetZoom(){sel=null;paint();animVB(home.slice())}
@@ -364,7 +368,7 @@ function paint(){
   const r=role(sel),[n0,t0]=INFO[sel],n=T(n0),t=lang==='ar'&&ARD[sel]||t0;
   const tag='';
   const sl=(SEC[sel]||[]);
-  info.innerHTML=`<b>${n}</b><span class="tag" style="background:var(--pri);color:#fff">${T('Primary')}</span><p>${t}</p>`+(ANT[sel]?`<p class="sm">${T('Opposed by')} ${T(ANT[sel])}</p>`:'')+mv(sel)+(sl.length?`<span class="tag" style="background:var(--sec);color:#111">${T('Secondary')}</span>`+sl.map(i=>`<p class="sm">${T(INFO[i][0])}</p>`).join(''):'');
+  info.innerHTML=`<b>${n}</b><span class="tag" style="background:var(--pri);color:#fff">${T(JT[sel]?'Joint':'Primary')}</span><p>${t}</p>`+(ANT[sel]?`<p class="sm">${T('Opposed by')} ${T(ANT[sel])}</p>`:'')+jx(sel)+mv(sel)+(sl.length?`<span class="tag" style="background:var(--sec);color:#111">${T(JT[sel]?'Connects':'Secondary')}</span>`+sl.map(i=>`<p class="sm">${T(INFO[i][0])}</p>`).join(''):'');
   [...info.children].forEach((c,i)=>c.style.setProperty('--i',i));
 }
 
@@ -393,7 +397,7 @@ function applyLang(){document.documentElement.lang=lang;document.getElementById(
  document.querySelectorAll('.legend span').forEach((s,i)=>s.lastChild.textContent=T(i?'Secondary':'Primary'));
  zr.textContent=T('Reset view');fig.querySelectorAll('.sct').forEach(x=>x.textContent=T(x.dataset.e));document.getElementById('lang').textContent=lang==='ar'?'EN':'AR';
  fig.querySelectorAll('.m[aria-label]').forEach(g=>g.setAttribute('aria-label',T(INFO[g.dataset.m][0])));
- fig.querySelectorAll('.dt text').forEach(x=>{x.textContent=T(x.dataset.e);const r=x.dataset.r,L=x.textContent.length*3.3+3;x.previousElementSibling.previousElementSibling.setAttribute('d',r?`M${396-L},${+x.dataset.ly-2}L${400-x.dataset.px},${x.dataset.py}`:`M${4+L},${+x.dataset.ly-2}L${x.dataset.px},${x.dataset.py}`)});
+ fig.querySelectorAll('.dt text').forEach(x=>{x.textContent=T(x.dataset.e);const r=x.dataset.r,L=x.textContent.length*3.3+3;x.previousElementSibling.previousElementSibling.setAttribute('d',r?`M${396-L},${+x.dataset.ly-2}L${400-x.dataset.px},${x.dataset.py}`:`M${(+x.dataset.x||4)+L},${+x.dataset.ly-2}L${x.dataset.px},${x.dataset.py}`)});
  paint();lbl()}
 Object.assign(ARN,{'Superficial':'سطحية','Deep':'عميقة','Scapular protraction (glide)':'دفع لوح الكتف للأمام (انزلاق)','Pectoralis minor':'العضلة الصدرية الصغرى','Biceps, short head':'ذات الرأسين، الرأس القصير','Biceps, long head':'ذات الرأسين، الرأس الطويل','Coracobrachialis':'العضلة الغرابية العضدية','Deep forearm muscles':'عضلات الساعد العميقة','Internal oblique and transversus abdominis':'المائلة الداخلية والبطنية المستعرضة','Vastus intermedius':'المتسعة المتوسطة','Psoas major and iliacus':'القطنية الكبرى والحرقفية','Adductor magnus and brevis':'المقربة الكبرى والقصيرة','Rhomboids':'العضلات المعينية','Supraspinatus':'فوق الشوكية','Infraspinatus and teres minor':'تحت الشوكية والمدورة الصغرى','Triceps, long head':'ثلاثية الرؤوس، الرأس الطويل','Triceps, lateral head':'ثلاثية الرؤوس، الرأس الوحشي','Triceps, medial head':'ثلاثية الرؤوس، الرأس الإنسي','Quadratus lumborum':'العضلة المربعة القطنية','Gluteus medius, minimus and piriformis':'الألوية الوسطى والصغرى والكمثرية','Medial head':'الرأس الإنسي','Internal oblique':'المائلة الداخلية','Psoas and iliacus':'القطنية والحرقفية','Adductor magnus':'المقربة الكبرى','Supinator, FDP':'المستلقية والقابضة العميقة'});
 Object.assign(ARD,{'pec-minor':'تقع تحت الصدرية الكبرى. تسحب لوح الكتف للأمام وللأسفل.',serratus:'تلتف حول الأضلاع وتثبّت لوح الكتف على الصدر. مهمة للدفع والوصول للأعلى.','int-obl':'طبقات بطنية عميقة تحت المائلة الخارجية. تشد الجذع مثل حزام طبيعي.','bicep-s':'تبدأ من النتوء الغرابي للوح الكتف. تعمل مع الرأس الطويل لثني المرفق.','bicep-l':'يمر وترها في أخدود العضد تحت الدالية والصدرية وترتبط داخل مفصل الكتف.',brachialis:'تقع تحت ذات الرأسين. أقوى عضلة ثانية للمرفق.',coraco:'عضلة صغيرة تحت ذات الرأسين ترفع الذراع للأمام وعبر الجسم.','forearm-deep':'المستلقية والقابضة العميقة للأصابع تقع تحت الطبقة السطحية. تقلب الكف وتثني الأصابع.','vast-int':'تقع مباشرة تحت المستقيمة الفخذية. تبسط الركبة.',psoas:'عضلات ثني الورك العميقة تمتد من أسفل العمود الفقري عبر الحوض إلى الفخذ.','adductors-d':'عضلات عميقة في الفخذ الداخلي. تسحب الساق للداخل وتساعد في بسط الورك.',rhomb:'تقع تحت شبه المنحرفة وتسحب لوحي الكتف نحو العمود الفقري.',supra:'عضلة من الكفة المدورة تحت شبه المنحرفة. تبدأ رفع الذراع للجانب.',infra:'عضلات الكفة المدورة خلف لوح الكتف. تدير الذراع للخارج.','tri-long':'تعبر مفصل الكتف لذلك تساعد أيضًا في بسط الذراع للخلف.','tri-lat':'الرأس الخارجي الظاهر في جانب الذراع. قوي في الدفع الثقيل.','tri-med':'يقع عميقًا تحت الرأسين الآخرين. يعمل في كل بسط للمرفق.',ql:'عضلة عميقة في أسفل الظهر تثني الجذع جانبيًا وتثبّت الحوض.','glute-deep':'تقع تحت الألوية الكبرى. تبعد الورك وتديره وتحافظ على توازن الحوض أثناء المشي.',soleus:'تقع تحت التوأمية. تبقيك منتصبًا وتدفع المشي والجري.'});
@@ -529,6 +533,107 @@ const SK3C=[
  ['skull',['M172,52C172,30 184,18 200,18C216,18 228,30 228,52C228,66 222,78 214,84C210,88 205,90 200,90C195,90 190,88 186,84C178,78 172,66 172,52Z','M172,66C170,72 172,78 176,80L178,72Z','M228,66C230,72 228,78 224,80L222,72Z','d:M200,18L200,70','d:M200,32L184,56L186,72','d:M200,32L216,56L214,72','d:M194,76C197,72 203,72 206,76','h:M186,24C192,19 208,19 214,24']],
  ['pelvis',['M186,338L214,338C216,358 212,384 206,402L200,420L194,402C188,384 184,358 186,338Z','M196,420L204,420L202,436L198,436Z','d:M200,342L200,408','k:M191,354a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0Z','k:M205.8,354a1.6,1.6 0 1,0 3.2,0a1.6,1.6 0 1,0 -3.2,0Z','k:M193,368a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0Z','k:M204,368a1.5,1.5 0 1,0 3,0a1.5,1.5 0 1,0 -3,0Z','k:M195,382a1.4,1.4 0 1,0 2.8,0a1.4,1.4 0 1,0 -2.8,0Z','k:M202.2,382a1.4,1.4 0 1,0 2.8,0a1.4,1.4 0 1,0 -2.8,0Z']]];
 document.getElementById('skel').innerHTML=`<g data-vw='s'><g>${bl2(SK2L,false)}</g><g transform='translate(400,0) scale(-1,1)'>${bl2(SK2L,true)}</g><g>${bl2(SK2C,false)}</g></g><g data-vw='sb' transform='translate(400,0)'><g>${bl2(SK3L,false)}</g><g transform='translate(400,0) scale(-1,1)'>${bl2(SK3L,true)}</g><g>${bl2(SK3C,false)}</g></g>`;
+/* ---------- detailed skeleton: split bones ---------- */
+Object.assign(INFO,{
+frontal:['Frontal bone','Forms the forehead and the roof of the eye sockets.'],
+parietal:['Parietal bones','Two bones that form the roof and upper sides of the skull.'],
+temporal:['Temporal bones','Form the sides of the skull and house the ear and the jaw joint.'],
+occipital:['Occipital bone','Forms the back of the skull and joins it to the first neck vertebra.'],
+nasal:['Nasal bones','Two small bones that form the bridge of the nose.'],
+zygomatic:['Zygomatic bones','The cheekbones. They shape the face and anchor the chewing muscles.'],
+maxilla:['Maxilla','The upper jaw. Holds the upper teeth and forms part of the nose and eye sockets.'],
+cervical:['Cervical spine (C1–C7)','Seven neck vertebrae. C1 (atlas) carries the skull and C2 (axis) lets the head turn.'],
+thoracic:['Thoracic spine (T1–T12)','Twelve vertebrae of the upper back. Each one joins a pair of ribs.'],
+lumbar:['Lumbar spine (L1–L5)','Five large vertebrae in the lower back. They carry most of the body weight.'],
+sacrum:['Sacrum','Five fused vertebrae that wedge between the hip bones and link the spine to the pelvis.'],
+coccyx:['Coccyx','The tailbone. Four small fused vertebrae and an anchor for pelvic floor muscles.'],
+ilium:['Ilium','The broad upper wing of the hip bone. Muscles of the hip and trunk attach here.'],
+ischium:['Ischium','The lower back part of the hip bone. You sit on its rounded tip.'],
+pubis:['Pubis','The front part of the hip bone. The two pubic bones meet at the pubic symphysis.'],
+carpals:['Carpal bones (wrist)','Eight small bones in two rows that make the wrist flexible.'],
+metacarpals:['Metacarpal bones (palm)','Five long bones that form the palm and the base of each finger.'],
+phalanges:['Phalanges of the fingers','Fourteen finger bones: three in each finger and two in the thumb.'],
+tarsals:['Tarsal bones (ankle and heel)','Seven bones including the talus and calcaneus. They carry the body weight into the foot.'],
+metatarsals:['Metatarsal bones','Five long bones that form the arch and the ball of the foot.'],
+'toe-phal':['Phalanges of the toes','Fourteen small toe bones that help balance and push-off.']});
+(()=>{const S='Sagittal plane',F='Frontal plane',T='Transverse plane',FA='Frontal axis',SA='Sagittal axis',VA='Vertical axis';
+Object.assign(PA,{cervical:[['Neck extension',S,FA],['Head rotation',T,VA]],thoracic:[['Trunk rotation',T,VA],['Lateral flexion',F,SA]],lumbar:[['Trunk flexion',S,FA],['Trunk extension',S,FA],['Lateral flexion',F,SA]],sacrum:[['Posterior pelvic tilt',S,FA]],ilium:[['Posterior pelvic tilt',S,FA],['Hip flexion',S,FA]],ischium:[['Hip extension',S,FA]],pubis:[['Hip adduction',F,SA]],temporal:[['Jaw closing (masseter)',S,FA]],occipital:[['Neck extension',S,FA]],carpals:[['Wrist flexion and extension',S,FA],['Radial and ulnar deviation',F,SA]],metacarpals:[['Radial and ulnar deviation',F,SA]],phalanges:[['Finger flexion and extension',S,FA]],tarsals:[['Ankle plantarflexion',S,FA],['Dorsiflexion (shin)',S,FA],['Inversion and eversion (approx.)',F,SA]],'toe-phal':[['Toe flexion and extension',S,FA]]})})();
+Object.assign(ARN,{'Frontal bone':'العظم الجبهي','Parietal bones':'العظمان الجداريان','Temporal bones':'العظمان الصدغيان','Occipital bone':'العظم القذالي','Nasal bones':'العظمان الأنفيان','Zygomatic bones':'العظمان الوجنيان','Maxilla':'الفك العلوي','Cervical spine (C1–C7)':'العمود الفقري العنقي (C1–C7)','Thoracic spine (T1–T12)':'العمود الفقري الصدري (T1–T12)','Lumbar spine (L1–L5)':'العمود الفقري القطني (L1–L5)','Sacrum':'العجز','Coccyx':'العصعص','Ilium':'العظم الحرقفي','Ischium':'العظم الإسكي','Pubis':'عظم العانة','Carpal bones (wrist)':'عظام الرسغ','Metacarpal bones (palm)':'عظام مشط اليد','Phalanges of the fingers':'سلاميات الأصابع','Tarsal bones (ankle and heel)':'عظام رسغ القدم','Metatarsal bones':'عظام مشط القدم','Phalanges of the toes':'سلاميات أصابع القدم','Finger flexion and extension':'ثني وبسط الأصابع','Toe flexion and extension':'ثني وبسط أصابع القدم','C1 (atlas)':'C1 (الأطلس)','C2 (axis)':'C2 (المحور)','Sacral foramina':'الثقوب العجزية','1st rib':'الضلع الأول','7th rib':'الضلع السابع','12th rib':'الضلع الثاني عشر','Patella (kneecap)':'الرضفة (غطاء الركبة)'});
+Object.assign(ARD,{frontal:'يشكل الجبهة وسقف تجويفي العينين.',parietal:'عظمتان تشكلان سقف الجمجمة وجانبيها العلويين.',temporal:'يشكلان جانبي الجمجمة ويحتويان الأذن ومفصل الفك.',occipital:'يشكل مؤخرة الجمجمة ويتصل بأول فقرة في الرقبة.',nasal:'عظمتان صغيرتان تشكلان جسر الأنف.',zygomatic:'عظما الخدين. يشكلان الوجه وتتصل بهما عضلات المضغ.',maxilla:'يحمل الأسنان العلوية ويشكل جزءًا من الأنف وتجويف العين.',cervical:'سبع فقرات في الرقبة. الأولى (الأطلس) تحمل الجمجمة والثانية (المحور) تتيح دوران الرأس.',thoracic:'اثنتا عشرة فقرة في أعلى الظهر. ترتبط كل فقرة بزوج من الأضلاع.',lumbar:'خمس فقرات كبيرة في أسفل الظهر. تحمل معظم وزن الجسم.',sacrum:'خمس فقرات ملتحمة تقع بين عظمتي الحوض وتربط العمود الفقري بالحوض.',coccyx:'عظمة الذيل. أربع فقرات صغيرة ملتحمة ومرتكز لعضلات قاع الحوض.',ilium:'الجناح العلوي العريض لعظم الورك. تتصل به عضلات الورك والجذع.',ischium:'الجزء السفلي الخلفي من عظم الورك. تجلس على طرفه المستدير.',pubis:'الجزء الأمامي من عظم الورك. يلتقي عظما العانة عند الارتفاق العاني.',carpals:'ثمانية عظام صغيرة في صفين تمنح الرسغ مرونته.',metacarpals:'خمسة عظام طويلة تشكل راحة اليد وقاعدة كل إصبع.',phalanges:'أربعة عشر عظمًا في الأصابع: ثلاثة في كل إصبع واثنان في الإبهام.',tarsals:'سبعة عظام منها الكاحل والعقب. تنقل وزن الجسم إلى القدم.',metatarsals:'خمسة عظام طويلة تشكل قوس القدم ومقدمتها.','toe-phal':'أربعة عشر عظمًا صغيرًا تساعد في التوازن والدفع.'});
+Object.assign(DET,{
+'s:cervical':{l:[],t:[['C1 (atlas)',200,92,84,100],['C2 (axis)',200,99,98,100],['C7',200,129,128,100]]},
+'s:thoracic':{l:[],t:[['T1',200,141,138,100],['T12',200,284,288,100]]},
+'s:lumbar':{l:[],t:[['L1',200,299,296,100],['L5',200,341,346,100]]},
+'s:sacrum':{l:[],t:[['Sacral foramina',194,368,372,100]]},
+'s:coccyx':{l:[],t:[['Coccyx',200,428,438,100]]},
+'s:ribs':{l:[],t:[['1st rib',170,134,112],['7th rib',139,220,214],['12th rib',170,270,282]]},
+'s:patella':{l:[],t:[['Patella (kneecap)',159,538,500,60]]}});
+function dt(v,m){return Object.keys(DET).filter(k=>k[0]===v).map(k=>{const id=k.slice(2),d=DET[k],dp=DEEPIDS.has(id);let s='';
+ if(m){if(dp)s=d.l.map(p=>`<path d='${p}'/>`).join('')}
+ else{if(!dp)s=d.l.map(p=>`<path d='${p}'/>`).join('');
+  s+=d.t.map(([t,px,py,ly,lx])=>dp?`<path class='ld' d='M${396-t.length*3.3-3},${ly-2}L${400-px},${py}'/><circle cx='${400-px}' cy='${py}' r='1.3' fill='#fff'/><text x='396' y='${ly}' text-anchor='end' data-r='1' data-e='${t}' data-px='${px}' data-py='${py}' data-ly='${ly}'>${t}</text>`:`<path class='ld' d='M${(lx||4)+t.length*3.3+3},${ly-2}L${px},${py}'/><circle cx='${px}' cy='${py}' r='1.3' fill='#fff'/><text x='${lx||4}' y='${ly}' data-x='${lx||4}' data-e='${t}' data-px='${px}' data-py='${py}' data-ly='${ly}'>${t}</text>`).join('')}
+ return `<g class='dt' data-d='${id}'>${s}</g>`}).join('')}
+const F4=[fing(73,408,-30,[26,14,9,8],[3.2,3,2.6,2.3]),fing(79,409,-20,[27,15,10,8],[3.2,3,2.6,2.3]),fing(85,409,-10,[25,14,9,8],[3.2,3,2.6,2.3]),fing(91,407,0,[22,10,7,7],[3,2.8,2.4,2.2]),fing(67,402,-52,[18,12,9],[3.6,3.2,2.8])];
+const fb=[148,153,158,163,169],fe=[143,151,159,167,176];
+const MT=fb.map((b,i)=>{const m=b+(fe[i]-b)*.45;return `M${b-1.6},708L${b+1.6},708L${m+1.4},718L${m-1.4},718Z`});
+const TP=fb.map((b,i)=>{const m=b+(fe[i]-b)*.45,e=fe[i];return `M${m-1.2},719L${m+1.2},719L${e+1},727L${e-1},727Z`});
+const ILI=['M196,338C182,326 158,326 140,334C131,339 127,348 129,357C131,366 137,373 146,378C150,384 156,388 160,388L170,386C178,380 186,376 188,372L190,356Z','d:M143,398a10,10 0 1,0 20,0a10,10 0 1,0 -20,0Z','d:M146,380C160,372 176,372 188,380','h:M190,334C172,328 152,329 138,336'];
+const ISC=['M142,396C142,408 150,418 160,421C163,432 168,441 176,447C183,450 189,444 190,438L188,426L176,414L160,404Z'];
+const PUB=['M176,414L188,426L190,438L194,428L200,420L200,414L196,408C190,398 186,390 182,392Z','k:M168,426C165,433 167,441 172,443C177,443 179,437 177,430Z'];
+const PAT=['patella',['M151,527C148,534 148,545 155,550C162,553 170,549 170,539C170,530 163,524 151,527Z','d:M155,533C157,530 164,531 165,537','h:M153,537C153,542 156,546 160,548']];
+const TF=hipB[2];
+const split=(L,back)=>L.flatMap(e=>e[0]==='pelvis'?[['ilium',back?[ILI[0],'d:M142,346C152,356 164,364 176,368','d:M148,338C160,350 172,358 184,362',ILI[3]]:ILI,TF],['ischium',back?ISC.concat(['k:M150,388C146,394 148,402 154,406']):ISC,TF],['pubis',PUB,TF]]:e[0]==='hand'?[['carpals',K],['metacarpals',F4.map(f=>f[0])],['phalanges',F4.flatMap(f=>f.slice(1))]]:e[0]==='foot'?(back?[['tarsals',e[1]]]:[['tarsals',FOOT.slice(0,3)],['metatarsals',MT],['toe-phal',TP]]):e[0]==='patella'?[PAT]:[e]);
+const sc=SK2C.find(e=>e[0]==='pelvis')[1],scb=SK3C.find(e=>e[0]==='pelvis')[1];
+const SK4L=split(SK2L,false),SK4BL=split(SK3L,true);SK4L.push(SK4L.splice(SK4L.findIndex(e=>e[0]==='patella'),1)[0]);
+const SK4C=[
+['lumbar',['v:M192,292h16v56h-16z',...VT.slice(58,73)]],['thoracic',['v:M193,134h14v158h-14z',...VT.slice(22,58)]],['cervical',['v:M195,88h10v47h-10z',...VT.slice(1,22)]],
+SK2C.find(e=>e[0]==='sternum'),
+['parietal',['M172,46C172,28 186,17 200,17C214,17 228,28 228,46C226,38 224,32 224,30C216,24 208,22 200,22C192,22 184,24 176,30C176,32 174,38 172,46Z','d:M200,18L200,22']],
+['frontal',['M174,56C173,48 174,42 176,38C176,32 184,24 200,22C216,24 224,32 224,38C226,42 227,48 226,56C216,52 208,50 200,50C192,50 184,52 174,56Z']],
+['temporal',['M172,54C170,62 171,72 176,78L183,74L182,56Z','M228,54C230,62 229,72 224,78L217,74L218,56Z']],
+['zygomatic',['M182,62C180,68 182,74 188,76L192,70C190,66 188,62 184,60Z','M218,62C220,68 218,74 212,76L208,70C210,66 212,62 216,60Z']],
+['nasal',['M197,56L203,56L204,66L196,66Z']],
+['maxilla',['M188,70C186,80 188,90 192,92L208,92C212,90 214,80 212,70L204,66L196,66Z','t:M190,88L210,88L209,92L191,92Z','d:M200,88L200,92']],
+SK2C.find(e=>e[0]==='mandible'),
+['sacrum',[sc[0],...sc.slice(2)]],['coccyx',[sc[1]]]];
+const SK4BC=[
+['lumbar',['v:M192,292h16v56h-16z',...VTB.slice(77,97)]],['thoracic',['v:M193,134h14v158h-14z',...VTB.slice(29,77)]],['cervical',['v:M195,88h10v47h-10z',...VTB.slice(1,29)]],
+['parietal',['M172,52C172,30 184,18 200,18C216,18 228,30 228,52C228,58 227,62 226,64C216,60 208,58 200,58C192,58 184,60 174,64C173,62 172,58 172,52Z','d:M200,18L200,58','h:M186,24C192,19 208,19 214,24']],
+['occipital',['M174,64C184,60 192,58 200,58C208,58 216,60 226,64C226,74 222,82 214,86C210,89 205,90 200,90C195,90 190,89 186,86C178,82 174,74 174,64Z','d:M200,32L184,56L186,72','d:M200,32L216,56L214,72','d:M194,76C197,72 203,72 206,76']],
+['temporal',['M172,66C170,72 172,78 176,80L180,72Z','M228,66C230,72 228,78 224,80L220,72Z']],
+['sacrum',[scb[0],...scb.slice(2)]],['coccyx',[scb[1]]]];
+const BASEF="<g class='bn' style='pointer-events:none'><path class='mb' d='M172,50C172,29 184,18 200,18C216,18 228,29 228,50C228,57 226,62 223,66L220,72C219,80 215,88 211,92L189,92C185,88 181,80 180,72L177,66C174,62 172,57 172,50Z'/></g>",BASEB="<g class='bn' style='pointer-events:none'><path class='mb' d='M172,52C172,30 184,18 200,18C216,18 228,30 228,52C228,66 222,78 214,84C210,88 205,90 200,90C195,90 190,88 186,84C178,78 172,66 172,52Z'/></g>",SOCKF="<path class='sock' d='M183,58a6,5 0 1,0 12,0a6,5 0 1,0 -12,0Z'/><path class='sock' d='M205,58a6,5 0 1,0 12,0a6,5 0 1,0 -12,0Z'/><path class='sock' d='M200,61C197,65 196,70 198,75L200,73L202,75C204,70 203,65 200,61Z'/>";
+/* ---------- joints ---------- */
+const JD=(()=>{const S='Sagittal plane',F='Frontal plane',T='Transverse plane',FA='Frontal axis',SA='Sagittal axis',VA='Vertical axis',LA='Longitudinal axis';
+const BAL='Synovial ball-and-socket',HIN='Synovial hinge',PIV='Synovial pivot',ELL='Synovial ellipsoid (condyloid)',SAD='Synovial saddle',GLI='Synovial gliding (plane)',MHI='Synovial modified hinge',DSC='Cartilaginous (disc)',SYM='Cartilaginous (pubic symphysis)';
+return [
+{id:'j-tmj',n:'Temporomandibular joint (jaw)',a:'المفصل الفكي الصدغي (الفك)',x:181,y:78,p:1,ty:MHI,b:['temporal','mandible'],m:[['Jaw closing (masseter)',S,FA],['Jaw side-to-side glide',T,VA]],d:'The only movable joint of the skull. Opens, closes and shifts the jaw.',ad:'المفصل المتحرك الوحيد في الجمجمة. يفتح الفك ويغلقه ويحركه جانبيًا.'},
+{id:'j-sc',n:'Sternoclavicular joint',a:'المفصل القصي الترقوي',x:194,y:122,p:1,ty:SAD,b:['sternum','clavicle'],m:[['Clavicle elevation and depression',F,SA],['Clavicle protraction and retraction',T,VA]],d:'The only joint that attaches the arm to the trunk.',ad:'المفصل الوحيد الذي يربط الذراع بالجذع.'},
+{id:'j-ac',n:'Acromioclavicular joint',a:'المفصل الأخرمي الترقوي',x:141,y:124,p:1,ty:GLI,b:['clavicle','scapula'],m:[['Scapular upward rotation',F,SA],['Scapular retraction (glide)',T,VA]],d:'Lets the shoulder blade tilt and glide as the arm lifts.',ad:'يتيح للوح الكتف الميلان والانزلاق عند رفع الذراع.'},
+{id:'j-gh',n:'Shoulder joint (glenohumeral)',a:'مفصل الكتف (العضدي الحقاني)',x:129,y:143,p:1,ty:BAL,b:['scapula','humerus'],m:[['Shoulder flexion',S,FA],['Shoulder extension',S,FA],['Shoulder abduction',F,SA],['Shoulder adduction',F,SA],['Shoulder internal rotation',T,VA],['Shoulder external rotation',T,VA]],d:'The most mobile joint in the body. Moves the arm in every direction.',ad:'أكثر مفصل حركة في الجسم. يحرك الذراع في كل الاتجاهات.'},
+{id:'j-elbow',n:'Elbow joint',a:'مفصل المرفق',x:108,y:300,p:1,ty:HIN,b:['humerus','ulna','radius'],m:[['Elbow flexion',S,FA],['Elbow extension',S,FA]],d:'A hinge that bends and straightens the arm.',ad:'مفصلة تثني الذراع وتفردها.'},
+{id:'j-pru',n:'Proximal radioulnar joint',a:'المفصل الكعبري الزندي العلوي',x:98,y:312,p:1,ty:PIV,b:['radius','ulna'],m:[['Forearm supination',T,LA],['Pronation',T,LA]],d:'The radius rolls around the ulna to turn the palm.',ad:'تدور الكعبرة حول الزند لقلب الكف.'},
+{id:'j-wrist',n:'Wrist joint (radiocarpal)',a:'مفصل الرسغ (الكعبري الرسغي)',x:78,y:394,p:1,ty:ELL,b:['radius','carpals'],m:[['Wrist flexion and extension',S,FA],['Radial and ulnar deviation',F,SA]],d:'Connects the forearm to the hand and moves it in two directions.',ad:'يصل الساعد باليد ويحركها في اتجاهين.'},
+{id:'j-mcp',n:'Knuckle joint (metacarpophalangeal)',a:'مفصل قاعدة الإصبع (المشطي السلامي)',x:70,y:434,p:1,ty:ELL,b:['metacarpals','phalanges'],m:[['Finger flexion and extension',S,FA],['Finger spreading (abduction)',F,SA]],d:'The knuckle. Bends the finger and spreads it sideways.',ad:'مفصل قاعدة الإصبع. يثني الإصبع ويباعده للجانب.'},
+{id:'j-ip',n:'Finger joint (interphalangeal)',a:'مفصل الإصبع (بين السلاميات)',x:64,y:449,p:1,ty:HIN,b:['phalanges'],m:[['Finger flexion and extension',S,FA]],d:'A simple hinge that curls the finger.',ad:'مفصلة بسيطة تثني الإصبع.'},
+{id:'j-hip',n:'Hip joint',a:'مفصل الورك',x:153,y:398,p:1,ty:BAL,b:['ilium','ischium','pubis','femur'],m:[['Hip flexion',S,FA],['Hip extension',S,FA],['Hip abduction',F,SA],['Hip adduction',F,SA],['Hip internal rotation',T,VA],['Hip external rotation',T,VA]],d:'A deep ball-and-socket that carries body weight and swings the leg.',ad:'مفصل كروي عميق يحمل وزن الجسم ويحرك الساق.'},
+{id:'j-si',n:'Sacroiliac joint',a:'المفصل العجزي الحرقفي',x:189,y:352,p:1,ty:GLI,b:['sacrum','ilium'],m:[['Slight nutation and counternutation',S,FA]],d:'An almost rigid joint that passes weight from the spine to the pelvis.',ad:'مفصل شبه ثابت ينقل الوزن من العمود الفقري إلى الحوض.'},
+{id:'j-knee',n:'Knee joint',a:'مفصل الركبة',x:171,y:533,p:1,ty:MHI,b:['femur','tibia','patella'],m:[['Knee flexion',S,FA],['Knee extension',S,FA],['Knee rotation (when flexed)',T,VA]],d:'The largest joint. Mostly bends and straightens, with slight rotation when bent.',ad:'أكبر مفصل. يثني ويفرد غالبًا مع دوران بسيط عند الثني.'},
+{id:'j-ankle',n:'Ankle joint (talocrural)',a:'مفصل الكاحل (الظنبوبي الكاحلي)',x:160,y:702,p:1,ty:HIN,b:['tibia','fibula','tarsals'],m:[['Ankle plantarflexion',S,FA],['Dorsiflexion (shin)',S,FA]],d:'A hinge that points the foot up and down.',ad:'مفصلة ترفع القدم وتخفضها.'},
+{id:'j-subtalar',n:'Subtalar joint',a:'المفصل تحت الكاحلي',x:160,y:711,p:1,ty:GLI,b:['tarsals'],m:[['Inversion and eversion (approx.)',F,SA]],d:'Tilts the sole inward and outward on uneven ground.',ad:'يميل باطن القدم للداخل وللخارج على الأرض غير المستوية.'},
+{id:'j-mtp',n:'Ball of the foot (metatarsophalangeal)',a:'مقدمة القدم (المفصل المشطي السلامي)',x:156,y:719,p:1,ty:ELL,b:['metatarsals','toe-phal'],m:[['Toe flexion and extension',S,FA]],d:'Bends the toes for push-off when walking.',ad:'يثني أصابع القدم للدفع أثناء المشي.'},
+{id:'j-ao',n:'Atlanto-occipital joint',a:'المفصل القذالي الأطلسي',x:200,y:86,p:0,ty:ELL,b:['occipital','cervical'],m:[['Head nodding (flexion)',S,FA],['Head tilt (side bending)',F,SA]],d:'The nodding joint between the skull and the first neck vertebra.',ad:'مفصل الإيماء بين الجمجمة وأول فقرة في الرقبة.'},
+{id:'j-aa',n:'Atlantoaxial joint',a:'المفصل الأطلسي المحوري',x:200,y:97,p:0,ty:PIV,b:['cervical'],m:[['Head rotation',T,VA]],d:'The pivot where C1 turns around C2. It lets you shake your head.',ad:'المحور الذي تدور عليه C1 حول C2. يتيح لك هز الرأس.'},
+{id:'j-lsj',n:'Lumbosacral joint',a:'المفصل القطني العجزي',x:200,y:344,p:0,ty:DSC,b:['lumbar','sacrum'],m:[['Trunk flexion',S,FA],['Trunk extension',S,FA],['Lateral flexion',F,SA]],d:'Where the lowest lumbar vertebra meets the sacrum. A disc cushions it.',ad:'حيث تلتقي أسفل فقرة قطنية بالعجز. يحميه قرص غضروفي.'},
+{id:'j-ps',n:'Pubic symphysis',a:'الارتفاق العاني',x:200,y:420,p:0,ty:SYM,b:['pubis'],m:[],d:'A cartilage joint that joins the two pubic bones with almost no movement.',ad:'مفصل غضروفي يربط عظمتي العانة بحركة شبه معدومة.'}]})();
+const JT={};
+Object.assign(ARN,{'Joint':'مفصل','Connects':'يربط بين','Joint type':'نوع المفصل','Synovial ball-and-socket':'مفصل زلالي كروي (كرة وحق)','Synovial hinge':'مفصل زلالي مفصلي (مفصلة)','Synovial pivot':'مفصل زلالي محوري','Synovial ellipsoid (condyloid)':'مفصل زلالي إهليجي (لقمي)','Synovial saddle':'مفصل زلالي سرجي','Synovial gliding (plane)':'مفصل زلالي انزلاقي (مستوي)','Synovial modified hinge':'مفصل زلالي مفصلي معدّل','Cartilaginous (disc)':'مفصل غضروفي (قرص)','Cartilaginous (pubic symphysis)':'مفصل غضروفي (ارتفاق)','Jaw side-to-side glide':'انزلاق الفك جانبيًا','Clavicle elevation and depression':'رفع وخفض الترقوة','Clavicle protraction and retraction':'دفع وسحب الترقوة','Shoulder abduction':'إبعاد الكتف','Hip abduction':'إبعاد الورك','Hip internal rotation':'دوران الورك للداخل','Finger spreading (abduction)':'تباعد الأصابع','Slight nutation and counternutation':'حركة طفيفة للعجز (إيماء وإيماء عكسي)','Knee rotation (when flexed)':'دوران الركبة (عند الثني)','Head nodding (flexion)':'إيماء الرأس (ثني)','Head tilt (side bending)':'ميل الرأس جانبيًا'});
+JD.forEach(j=>{INFO[j.id]=[j.n,j.d];ARN[j.n]=j.a;ARD[j.id]=j.ad;if(j.m.length)PA[j.id]=j.m;SEC[j.id]=j.b;JT[j.id]=j.ty});
+function jx(id){return JT[id]?`<span class="tag" style="background:#3a3a3f;color:#fff">${T('Joint type')}</span><p class="sm">${T(JT[id])}</p>`:''}
+const jm=(j,x,m)=>`<g class='m jt' data-m='${j.id}' ${m?`aria-hidden='true'`:`tabindex='0' role='button' aria-label='${j.n}'`}><circle cx='${x}' cy='${j.y}' r='7' fill='rgba(0,0,0,0)'/><circle class='jc' cx='${x}' cy='${j.y}' r='3.6'/></g>`;
+const jl=m=>JD.filter(j=>j.p).map(j=>jm(j,j.x,m)).join(''),jc=()=>JD.filter(j=>!j.p).map(j=>jm(j,j.x,false)).join('');
+const HIPB=`<g class='bn' style='pointer-events:none' transform='${TF}'><path class='mb' d='${hipB[1][0]}'/></g>`;
+document.getElementById('skel').innerHTML=`<g data-vw='s'><g>${HIPB}${bl2(SK4L,false)}</g><g transform='translate(400,0) scale(-1,1)'>${HIPB}${bl2(SK4L,true)}</g><g>${BASEF}${bl2(SK4C,false)}${SOCKF}${dt('s',false)}</g><g>${jl(false)}</g><g transform='translate(400,0) scale(-1,1)'>${jl(true)}</g><g>${jc()}</g></g><g data-vw='sb' transform='translate(400,0)'><g>${HIPB}${bl2(SK4BL,false)}</g><g transform='translate(400,0) scale(-1,1)'>${HIPB}${bl2(SK4BL,true)}</g><g>${BASEB}${bl2(SK4BC,false)}${dt('s',false)}</g><g>${jl(false)}</g><g transform='translate(400,0) scale(-1,1)'>${jl(true)}</g><g>${jc()}</g></g>`;
 document.getElementById('sk').onclick=()=>{skel=!skel;cancelAnimationFrame(raf);sel=null;
  document.getElementById('views').style.display=skel?'none':'';document.getElementById('skel').style.display=skel?'':'none';
  document.querySelector('.legend').style.display=skel?'none':'';
