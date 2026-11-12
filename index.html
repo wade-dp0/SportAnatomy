@@ -67,6 +67,8 @@ svg{display:block;width:100%;height:auto;max-height:78vh;margin:0 auto;overflow:
 .hl{fill:none;stroke:#fffaf0;stroke-width:.8;opacity:.6;pointer-events:none;stroke-linecap:round}
 .tooth{fill:#f7f5ec;stroke:#8d8470;stroke-width:.4;pointer-events:none}
 .jt{cursor:pointer}
+.lf path{fill:none;stroke:#ffd34a;stroke-width:1.1;stroke-linecap:round;opacity:0;pointer-events:none;transition:opacity .2s;filter:drop-shadow(0 0 1.2px #000)}
+#fig.lfa .lf path{opacity:.7}.lf path.on{opacity:1!important;stroke-width:1.7}
 .jc{fill:rgba(255,255,255,.14);stroke:#ff8a80;stroke-width:1.1;pointer-events:none;transition:fill .2s}
 .jt:hover .jc{fill:rgba(255,138,128,.5)}
 .m.jt.p .jc{fill:#e8372f;stroke:#fff}
@@ -87,7 +89,7 @@ svg{display:block;width:100%;height:auto;max-height:78vh;margin:0 auto;overflow:
 <main class="card">
   <h1 id="title">Muscle map</h1>
   <div class="bar">
-    <div style="order:2;display:flex;gap:8px"><button class="lg" id="sk" aria-label="Skeleton" aria-pressed="false"><svg viewBox='0 0 24 24' width='22' height='22' fill='currentColor'><path d='M12 2C7 2 3.5 5.6 3.5 10c0 2.6 1.2 4.6 3 5.8V20h3v-2h1v2h2v-2h1v2h3v-4.2c1.8-1.2 3-3.2 3-5.8C20.5 5.6 17 2 12 2zM8.5 12.5a2 2 0 110-4 2 2 0 010 4zm7 0a2 2 0 110-4 2 2 0 010 4zM12 14l-1.2 2h2.4z'/></svg></button><button class="lg" id="lang">AR</button></div>
+    <div style="order:2;display:flex;gap:8px"><button class="lg" id="fl" aria-label="Line of force" title="Line of force" aria-pressed="true"><svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 19L19 5M10 5h9v9'/></svg></button><button class="lg" id="sk" aria-label="Skeleton" aria-pressed="false"><svg viewBox='0 0 24 24' width='22' height='22' fill='currentColor'><path d='M12 2C7 2 3.5 5.6 3.5 10c0 2.6 1.2 4.6 3 5.8V20h3v-2h1v2h2v-2h1v2h3v-4.2c1.8-1.2 3-3.2 3-5.8C20.5 5.6 17 2 12 2zM8.5 12.5a2 2 0 110-4 2 2 0 010 4zm7 0a2 2 0 110-4 2 2 0 010 4zM12 14l-1.2 2h2.4z'/></svg></button><button class="lg" id="lang">AR</button></div>
     <div class="seg" role="group" aria-label="View">
       <button data-v="f" aria-pressed="false">Front</button>
       <button data-v="b" aria-pressed="false">Back</button>
@@ -389,7 +391,7 @@ function paint(){
   
   fig.querySelectorAll('.m').forEach(el=>{const r=role(el.dataset.m);
     el.classList.toggle('p',r==='p');el.classList.toggle('s',r==='s');el.classList.toggle('sel',el.dataset.m===sel)});
-  fig.querySelectorAll('.dt').forEach(d=>d.classList.toggle('on',d.dataset.d===sel));zr.hidden=!sel;
+  fig.querySelectorAll('.dt').forEach(d=>d.classList.toggle('on',d.dataset.d===sel));fig.querySelectorAll('.lf path').forEach(p=>p.classList.toggle('on',p.dataset.m===sel));zr.hidden=!sel;
   
   if(!sel){info.innerHTML=`<p>${T('Tap a muscle to learn more.')}</p>`;return}
   const r=role(sel),[n0,t0]=INFO[sel],n=T(n0),t=lang==='ar'&&ARD[sel]||t0;
@@ -656,10 +658,23 @@ return [
 const JT={};
 Object.assign(ARN,{'Joint':'مفصل','Connects':'يربط بين','Joint type':'نوع المفصل','Synovial ball-and-socket':'مفصل زلالي كروي (كرة وحق)','Synovial hinge':'مفصل زلالي مفصلي (مفصلة)','Synovial pivot':'مفصل زلالي محوري','Synovial ellipsoid (condyloid)':'مفصل زلالي إهليجي (لقمي)','Synovial saddle':'مفصل زلالي سرجي','Synovial gliding (plane)':'مفصل زلالي انزلاقي (مستوي)','Synovial modified hinge':'مفصل زلالي مفصلي معدّل','Cartilaginous (disc)':'مفصل غضروفي (قرص)','Cartilaginous (pubic symphysis)':'مفصل غضروفي (ارتفاق)','Jaw side-to-side glide':'انزلاق الفك جانبيًا','Clavicle elevation and depression':'رفع وخفض الترقوة','Clavicle protraction and retraction':'دفع وسحب الترقوة','Shoulder abduction':'إبعاد الكتف','Hip abduction':'إبعاد الورك','Hip internal rotation':'دوران الورك للداخل','Finger spreading (abduction)':'تباعد الأصابع','Slight nutation and counternutation':'حركة طفيفة للعجز (إيماء وإيماء عكسي)','Knee rotation (when flexed)':'دوران الركبة (عند الثني)','Head nodding (flexion)':'إيماء الرأس (ثني)','Head tilt (side bending)':'ميل الرأس جانبيًا'});
 JD.forEach(j=>{INFO[j.id]=[j.n,j.d];ARN[j.n]=j.a;ARD[j.id]=j.ad;if(j.m.length)PA[j.id]=j.m;SEC[j.id]=j.b;JT[j.id]=j.ty});
-function jx(id){return JT[id]?`<span class="tag" style="background:#3a3a3f;color:#fff">${T('Joint type')}</span><p class="sm">${T(JT[id])}</p>`:''}
+function jx(id){return JT[id]?`<span class="tag" style="background:#3a3a3f;color:#fff">${T('Joint type')}</span><p class="sm">${T(JT[id])}</p>`:(FLID.has(id)?`<span class="tag" style="background:#ffd34a;color:#111">${T('Line of force')}</span><p class="sm">${T('Arrow points from the insertion toward the origin: the direction the muscle pulls.')}</p>`:'')}
 const jm=(j,x,m)=>`<g class='m jt' data-m='${j.id}' ${m?`aria-hidden='true'`:`tabindex='0' role='button' aria-label='${j.n}'`}><circle cx='${x}' cy='${j.y}' r='5' fill='rgba(0,0,0,0)'/><circle class='jc' cx='${x}' cy='${j.y}' r='3.6'/></g>`;
 const jl=m=>JD.filter(j=>j.p).map(j=>jm(j,j.x,m)).join(''),jc=()=>JD.filter(j=>!j.p).map(j=>jm(j,j.x,false)).join('');
 const JM={'j-tmj':['face'],'j-sc':['traps','chest'],'j-ac':['traps','delt-f','delt-r'],'j-gh':['delt-f','delt-r','chest','lats','rotator','supra','infra','coraco'],'j-elbow':['biceps','brachialis','triceps','tri-long','tri-lat','tri-med','bicep-s','bicep-l'],'j-pru':['biceps','forearms','forearm-deep'],'j-wrist':['forearms','forearm-deep'],'j-mcp':['forearms','forearm-deep'],'j-ip':['forearm-deep'],'j-hip':['glutes','hipflex','psoas','adductors','adductors-d','quads','hams','glute-deep','sartorius'],'j-si':['lowback','glutes','ql'],'j-knee':['quads','vast-int','hams','calves'],'j-ankle':['calves','soleus'],'j-subtalar':['calves'],'j-mtp':['calves'],'j-ao':['traps'],'j-aa':['traps'],'j-lsj':['lowback','abs','ql'],'j-ps':[]};
+/* ---------- line of force: arrow from the insertion toward the origin (the direction the muscle pulls) ----------
+   'view id insX insY orgX orgY [deep]'  coordinates are in the left-half frame; deep rows are mirrored onto the right half */
+const FL=['f chest 136 172 194 168','f delt-f 100 214 134 152','f biceps 98 298 103 228','f triceps 82 304 88 240','f forearms 68 390 98 312','f abs 192 218 192 314','f obliques 170 322 158 232','f quads 168 500 168 352','f quads 150 500 136 376','f quads 190 508 188 440','f adductors 188 436 194 356','f calves 158 668 150 556','f calves 140 640 134 556','f sartorius 190 442 148 348','f hipflex 140 396 134 356','f hipflex 178 346 190 330','f traps 146 138 196 114','f face 186 80 181 64',
+'f pec-minor 146 152 176 194 d','f serratus 136 158 152 250 d','f int-obl 176 230 170 330 d','f bicep-s 102 300 149 153 d','f bicep-l 92 300 128 143 d','f brachialis 100 305 96 264 d','f coraco 116 228 140 166 d','f forearm-deep 74 378 96 314 d','f vast-int 166 494 164 376 d','f psoas 160 376 186 332 d','f adductors-d 190 438 192 352 d','f calves 156 660 152 556 d',
+'b traps 142 137 197 114','b traps 172 206 198 248','b lats 152 204 188 312','b delt-r 104 216 134 138','b triceps 98 302 112 208','b lowback 184 262 190 330','b glutes 146 404 196 344','b hams 150 520 148 412','b hams 178 520 186 418','b calves 178 634 178 552','b calves 150 632 150 556','b calves 166 676 166 640','b rotator 130 190 148 176','b rotator 116 232 130 210','b forearms 72 382 92 314',
+'b rhomb 152 172 196 138 d','b supra 132 142 166 142 d','b infra 132 170 168 180 d','b tri-long 110 300 122 200 d','b tri-lat 90 298 96 238 d','b tri-med 100 304 97 264 d','b ql 186 304 172 338 d','b glute-deep 140 376 170 334 d','b glute-deep 150 398 192 380 d','b soleus 164 648 160 570 d','b forearm-deep 74 384 92 316 d','b adductors-d 190 510 188 424 d'];
+const FLID=new Set(FL.map(r=>r.split(' ')[1]));
+document.querySelector('#fig defs').insertAdjacentHTML('beforeend',`<marker id='ah' viewBox='0 0 6 6' refX='5' refY='3' markerWidth='5' markerHeight='5' orient='auto'><path d='M0,0L6,3L0,6Z' fill='#ffd34a' stroke='none'/></marker>`);
+document.querySelectorAll('#views [data-vw]').forEach(g=>{const v=g.dataset.vw,r=FL.map(s=>s.split(' ')).filter(a=>a[0]===v),mk=d=>r.filter(a=>!!a[6]===d).map(a=>`<path data-m='${a[1]}' d='M${a[2]},${a[3]}L${a[4]},${a[5]}' marker-end='url(#ah)'/>`).join('');
+ g.insertAdjacentHTML('beforeend',`<g class='lf'>${mk(false)}</g><g class='lf' transform='translate(400,0) scale(-1,1)'>${mk(true)}</g>`)});
+fig.classList.add('lfa');
+document.getElementById('fl').onclick=function(){this.setAttribute('aria-pressed',fig.classList.toggle('lfa'))};
+Object.assign(ARN,{'Line of force':'خط القوة','Arrow points from the insertion toward the origin: the direction the muscle pulls.':'يشير السهم من المغرز نحو المنشأ، أي اتجاه شد العضلة.'});
 Object.assign(ARN,{'Moved by':'العضلات المحركة'});
 function jmv(id){const a=JM[id]||[];return a.length?`<span class="tag" style="background:var(--sec);color:#111">${T('Moved by')}</span>`+a.map(i=>`<p class="sm">${T(INFO[i][0])}</p>`).join(''):''}
 document.querySelectorAll('#views [data-vw]').forEach(g=>{const back=g.dataset.vw==='b',ok=j=>!back||!['j-ps','j-sc'].includes(j.id);
@@ -669,7 +684,7 @@ document.getElementById('skel').innerHTML=`<g data-vw='s'><g>${HIPB}${bl2(SK4L,f
 document.getElementById('sk').onclick=()=>{skel=!skel;cancelAnimationFrame(raf);sel=null;
  document.getElementById('views').style.display=skel?'none':'';document.getElementById('skel').style.display=skel?'':'none';
  document.querySelector('.legend').style.display=skel?'none':'';
- document.getElementById('sk').setAttribute('aria-pressed',skel);
+ document.getElementById('sk').setAttribute('aria-pressed',skel);document.getElementById('fl').style.display=skel?'none':'';
  home=VB[curV].split(' ').map(Number);setVB(home.slice());applyLang()};
 document.getElementById('lang').onclick=()=>{lang=lang==='ar'?'en':'ar';applyLang()};
 paint();
