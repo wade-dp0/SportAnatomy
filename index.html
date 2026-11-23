@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#101010">
 <title>SportAnatomy · Muscle map</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,500;0,700;1,800&family=Noto+Sans+Arabic:wght@500;700&family=Mako&display=swap">
 <style>
@@ -83,13 +84,26 @@ svg{display:block;width:100%;height:auto;max-height:78vh;margin:0 auto;overflow:
 .tag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:4px;font-size:12px;font-weight:700;color:#111}
 .info p{margin:4px 0 0;color:var(--mute)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}.info>*{animation:none!important;opacity:1!important}}
+/* the app fills the whole window on every screen (phone, tablet, PC) */
+@media all{
+ html,body{height:100%}body{display:block;padding:0;overflow:hidden}
+ .card{max-width:none;width:100%;height:100vh;height:100dvh;border:0;border-radius:0;display:flex;flex-direction:column;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
+ h1{font-size:18px;margin:0 0 8px}
+ .layout{flex:1;min-height:0;margin-top:8px;grid-template-rows:minmax(0,1fr);align-items:stretch}
+ .layout .info{position:static!important;max-height:none;height:100%;overflow:auto}
+ .stage{display:flex;flex-direction:column;min-height:0}
+ svg{flex:1;min-height:0;height:100%;max-height:none}
+ .lbl{flex:none}
+ .by{font-size:12px;bottom:calc(2px + env(safe-area-inset-bottom,0px));right:8px}
+}
+@media (min-width:901px){.layout{grid-template-columns:330px 1fr;gap:18px}.card{padding:14px 22px}h1{font-size:22px}.layout .info{font-size:15px}.by{font-size:15px;right:16px;bottom:8px}}
 </style>
 </head>
 <body>
 <main class="card">
   <h1 id="title">Muscle map</h1>
   <div class="bar">
-    <div style="order:2;display:flex;gap:8px"><button class="lg" id="fl" aria-label="Line of force" title="Line of force" aria-pressed="true"><svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 19L19 5M10 5h9v9'/></svg></button><button class="lg" id="sk" aria-label="Skeleton" aria-pressed="false"><svg viewBox='0 0 24 24' width='22' height='22' fill='currentColor'><path d='M12 2C7 2 3.5 5.6 3.5 10c0 2.6 1.2 4.6 3 5.8V20h3v-2h1v2h2v-2h1v2h3v-4.2c1.8-1.2 3-3.2 3-5.8C20.5 5.6 17 2 12 2zM8.5 12.5a2 2 0 110-4 2 2 0 010 4zm7 0a2 2 0 110-4 2 2 0 010 4zM12 14l-1.2 2h2.4z'/></svg></button><button class="lg" id="lang">AR</button></div>
+    <div style="order:2;display:flex;gap:8px"><button class="lg" id="fs" aria-label="Full screen" title="Full screen" hidden><svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'/></svg></button><button class="lg" id="fl" aria-label="Line of force" title="Line of force" aria-pressed="true"><svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 19L19 5M10 5h9v9'/></svg></button><button class="lg" id="sk" aria-label="Skeleton" aria-pressed="false"><svg viewBox='0 0 24 24' width='22' height='22' fill='currentColor'><path d='M12 2C7 2 3.5 5.6 3.5 10c0 2.6 1.2 4.6 3 5.8V20h3v-2h1v2h2v-2h1v2h3v-4.2c1.8-1.2 3-3.2 3-5.8C20.5 5.6 17 2 12 2zM8.5 12.5a2 2 0 110-4 2 2 0 010 4zm7 0a2 2 0 110-4 2 2 0 010 4zM12 14l-1.2 2h2.4z'/></svg></button><button class="lg" id="lang">AR</button></div>
     <div class="seg" role="group" aria-label="View">
       <button data-v="f" aria-pressed="false">Front</button>
       <button data-v="b" aria-pressed="false">Back</button>
@@ -673,6 +687,15 @@ document.querySelector('#fig defs').insertAdjacentHTML('beforeend',`<marker id='
 document.querySelectorAll('#views [data-vw]').forEach(g=>{const v=g.dataset.vw,r=FL.map(s=>s.split(' ')).filter(a=>a[0]===v),mk=d=>r.filter(a=>!!a[6]===d).map(a=>`<path data-m='${a[1]}' d='M${a[2]},${a[3]}L${a[4]},${a[5]}' marker-end='url(#ah)'/>`).join('');
  g.insertAdjacentHTML('beforeend',`<g class='lf'>${mk(false)}</g><g class='lf' transform='translate(400,0) scale(-1,1)'>${mk(true)}</g>`)});
 fig.classList.add('lfa');
+/* full screen: button + automatic on the first tap on phones (browsers only allow it after a tap); iPhone Safari has no such API, so use Share > Add to Home Screen */
+(function(){const de=document.documentElement,req=de.requestFullscreen||de.webkitRequestFullscreen,ext=document.exitFullscreen||document.webkitExitFullscreen,b=document.getElementById('fs'),isFs=()=>document.fullscreenElement||document.webkitFullscreenElement;
+ if(!req)return;b.hidden=false;
+ const go=()=>{try{const r=req.call(de);if(r&&r.catch)r.catch(()=>{})}catch(e){}},out=()=>{try{ext.call(document)}catch(e){}};
+ b.onclick=()=>isFs()?out():go();
+ addEventListener('keydown',e=>{if((e.key==='f'||e.key==='F')&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))b.click()});
+ if(matchMedia('(max-width:900px) and (pointer:coarse)').matches){const once=()=>{removeEventListener('pointerup',once);if(!isFs())go()};addEventListener('pointerup',once)}})();
+/* on a narrow phone start with one figure so it fills the screen (Both is still one tap away) */
+if(matchMedia('(max-width:600px)').matches)document.querySelector('.seg button[data-v=f]').click();
 document.getElementById('fl').onclick=function(){this.setAttribute('aria-pressed',fig.classList.toggle('lfa'))};
 Object.assign(ARN,{'Line of force':'خط القوة','Arrow points from the insertion toward the origin: the direction the muscle pulls.':'يشير السهم من المغرز نحو المنشأ، أي اتجاه شد العضلة.'});
 Object.assign(ARN,{'Moved by':'العضلات المحركة'});
