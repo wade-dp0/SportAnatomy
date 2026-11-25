@@ -1,181 +1,351 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#101010">
-<title>SportAnatomy · Muscle map</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,500;0,700;1,800&family=Noto+Sans+Arabic:wght@500;700&family=Mako&display=swap">
-<style>
-:root{--page:#0d0d0e;--card:#171718;--line:#2a2a2d;--text:#ededee;--mute:#8d8d93;--pri:#e8372f;--sec:#fda36a;
-box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--page:#e6e4e1}}
-:root[data-theme="light"]{--page:#e6e4e1}
-*{box-sizing:border-box}
-html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;background:var(--page);color:var(--text);font:500 15px/1.4 Saira,"Noto Sans Arabic","Arial Narrow",system-ui,sans-serif;display:flex;justify-content:center;padding:20px 12px}
-.card{width:100%;max-width:760px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 20px 18px}
-h1{margin:0 0 14px;font:italic 800 24px/1.1 Saira,sans-serif;text-transform:uppercase;letter-spacing:.01em}
-.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
-.seg{display:inline-flex;background:#0f0f10;border:1px solid var(--line);border-radius:8px;padding:3px}
-.seg button{all:unset;cursor:pointer;padding:8px 16px;border-radius:6px;font-weight:700;color:var(--mute)}
-.seg button[aria-pressed=true]{background:var(--pri);color:#fff}
-.seg button:focus-visible,.chips button:focus-visible{outline:2px solid #fff;outline-offset:2px}
-.legend{display:flex;gap:16px;color:var(--mute);font-weight:700;font-size:14px}
-.legend i{display:inline-block;width:14px;height:12px;border-radius:2px;margin-right:6px;vertical-align:-1px}
-.chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
-.chips button{all:unset;cursor:pointer;padding:6px 12px;border:1px solid var(--line);border-radius:999px;color:var(--mute);font-weight:700;font-size:14px}
-.chips button[aria-pressed=true]{color:var(--text);border-color:#5a5a60;background:#242427}
-svg{display:block;width:100%;height:auto;max-height:78vh;margin:0 auto;overflow:hidden}
-.layout{display:grid;grid-template-columns:240px 1fr;gap:16px;margin-top:14px;align-items:start}
-.stage{min-width:0;position:relative}
-.zr{position:absolute;top:6px;right:6px;z-index:2;cursor:pointer;background:#242427;color:var(--text);border:1px solid #4a4a50;border-radius:6px;padding:5px 10px;font:700 13px Saira,sans-serif}
-.zr[hidden]{display:none}
-.dt{opacity:0;pointer-events:none;transition:opacity .45s .35s}
-.dt.on{opacity:1}
-.dt path{stroke:rgba(255,255,255,.4);stroke-width:.7;fill:none;stroke-linecap:round}
-.dt .ld{stroke:#fff;stroke-width:.45;opacity:.85}
-.dt text{font:700 6.5px Saira,'Noto Sans Arabic',sans-serif;fill:#fff;paint-order:stroke;stroke:#000;stroke-width:1.8px;stroke-linejoin:round}
-@media (max-width:640px){.layout{grid-template-columns:132px 1fr;gap:8px}.layout .info{padding:10px;font-size:13px;min-height:120px}.layout .info b{font-size:16px}.card{padding:14px 10px}}
-.base{fill:#19191b;stroke:#303035;stroke-width:1.5}
-.guide{stroke:#55555b;stroke-width:1;stroke-dasharray:2 3;fill:none}
-.mb{fill:url(#gn);stroke:rgba(8,8,10,.6);stroke-width:.8;stroke-linejoin:round;transition:fill .2s}
-.fg{pointer-events:none}.fs{fill:none;stroke-linecap:round}
-.fs.d{stroke:rgba(0,0,0,.34);stroke-width:.55}.fs.l{stroke:rgba(255,255,255,.17);stroke-width:.5}.fs.b{stroke:rgba(0,0,0,.45);stroke-width:1.1}
-.mf{pointer-events:none;opacity:.9}
-.m{cursor:pointer;outline:none}
-.m:hover .mb{filter:brightness(1.3)}
-.m.p .mb{fill:url(#gp)} .m.s .mb{fill:url(#gs)}
-.m[data-m=tendon] .mb{fill:url(#gt)}
-.m[data-m=tendon] .mf{opacity:.3}
-.m[data-m=tendon] .mb{stroke-width:.5}
-.m.p{filter:drop-shadow(0 0 5px rgba(232,55,47,.55))}
-.m.s{filter:drop-shadow(0 0 4px rgba(253,163,106,.35))}
-.m.sel .mb,.m:focus-visible .mb{stroke:#fff;stroke-width:1.8}
-.lbl{display:flex;justify-content:space-around;color:var(--mute);font-weight:700;letter-spacing:.12em;font-size:13px;margin-top:2px}
-.info{position:sticky;top:12px;padding:16px;border:1px solid var(--line);border-left:3px solid var(--pri);border-radius:8px;background:#121213;min-height:150px}
-.info b{font-size:20px;display:block;font-style:italic}
-.info>*{opacity:0;animation:li .4s ease forwards;animation-delay:calc(var(--i,0)*110ms)}
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Multi-sport muscle map and skill search</title><style>body{margin:0}.sport-app{--page:#0d0d0e;--card:#171718;--line:#2a2a2d;--text:#ededee;--mute:#9a9aa1;--pri:#e8372f;--sec:#fda36a;box-sizing:border-box;margin:0;padding:12px;background:var(--page);color:var(--text);font:500 15px/1.4 Saira,"Noto Sans Arabic",Arial,system-ui,sans-serif;color-scheme:dark;position:relative}
+.sport-app *{box-sizing:border-box}
+.sport-app button{color:inherit;font-family:inherit}
+.sport-app .card{max-width:1100px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px 10px;position:relative}
+.sport-app .topbar{display:flex;align-items:center;gap:10px}
+.sport-app h1{flex:1 1 auto;min-width:0;margin:0;font:italic 800 20px/1.1 Saira,sans-serif;text-transform:uppercase;letter-spacing:.01em}
+.sport-app.is-ar h1,.sport-app.is-ar .info b{font-style:normal;text-transform:none}
+.sport-app .tools{display:flex;gap:8px}
+.sport-app .lg{cursor:pointer;background:#242427;border:1px solid #4a4a50;border-radius:10px;padding:8px 12px;min-height:44px;min-width:44px;font:700 14px Saira,'Noto Sans Arabic',sans-serif;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.sport-app .lg[hidden]{display:none}
+.sport-app .lg[aria-pressed=true],.sport-app .menu[aria-expanded=true]{background:var(--pri);border-color:var(--pri);color:#fff}
+.sport-app .lg svg{display:block}
+.sport-app .bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;margin-top:12px}
+.sport-app .seg{display:inline-flex;background:#0f0f10;border:1px solid var(--line);border-radius:10px;padding:3px}
+.sport-app .seg button{all:unset;cursor:pointer;padding:9px 16px;border-radius:8px;font-weight:700;color:#aaaab0}
+.sport-app .seg button[aria-pressed=true]{background:var(--pri);color:#fff}
+.sport-app .legend{display:flex;gap:16px;color:#aaaab0;font-weight:700;font-size:14px}
+.sport-app .legend i{display:inline-block;width:14px;height:12px;border-radius:2px;margin-inline-end:6px;vertical-align:-1px}
+.sport-app .shell{position:relative;margin-top:12px;min-height:520px}
+.sport-app .layout{display:grid;grid-template-columns:330px 1fr;gap:16px;align-items:start}
+.sport-app .stage{min-width:0;position:relative}
+.sport-app #fig{display:block;width:100%;height:auto;aspect-ratio:800/740;margin:0 auto;overflow:hidden}
+.sport-app .lbl{display:flex;justify-content:space-around;color:var(--mute);font-weight:700;letter-spacing:.12em;font-size:13px;margin-top:2px}
+.sport-app .zr{position:absolute;top:6px;right:6px;z-index:2;cursor:pointer;background:#242427;border:1px solid #4a4a50;border-radius:6px;padding:5px 10px;font:700 13px Saira,sans-serif}
+.sport-app .zr[hidden]{display:none}
+.sport-app .by{text-align:right;padding:10px 4px 2px;font:400 15px 'Mako Kaiju','Mako',sans-serif;color:var(--mute);letter-spacing:.04em}
+/* sidebar */
+.sport-app .scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:25;opacity:0;pointer-events:none;transition:opacity .25s;border-radius:10px}
+.sport-app .scrim.on{opacity:1;pointer-events:auto}
+.sport-app .side{position:absolute;top:0;bottom:0;inset-inline-start:0;width:min(88%,330px);z-index:30;background:#131314;border:1px solid #3a3a3f;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.6);transform:translateX(-106%);visibility:hidden;transition:transform .28s ease,visibility 0s .28s}
+.sport-app.is-ar .side{transform:translateX(106%)}
+.sport-app .side.open{transform:none;visibility:visible;transition:transform .28s ease}
+.sport-app .side{overflow:hidden}.sport-app .side-in{position:sticky;top:0;max-height:min(100vh,100%);overflow:auto;padding:14px}
+.sport-app .side-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
+.sport-app .side-head b{font-size:16px}
+.sport-app .side-head button{cursor:pointer;background:#242427;border:1px solid #4a4a50;border-radius:10px;width:44px;height:44px;font-size:22px;line-height:1}
+.sport-app .skill-search label{display:block;font-size:14px;font-weight:700;margin-bottom:5px}
+.sport-app .search-row{display:flex;gap:8px}
+.sport-app #skillQuery{width:100%;min-width:0;border:1px solid #52525b;background:#101011;color:#fff;border-radius:10px;padding:11px 12px;font:500 16px Saira,system-ui,sans-serif}
+.sport-app #skillQuery:focus{outline:2px solid var(--sec);outline-offset:1px}
+.sport-app #clearSkill{background:#242427;color:#eee;border:1px solid #52525b;border-radius:10px;padding:8px 14px;font:700 14px Saira,'Noto Sans Arabic',sans-serif;cursor:pointer;min-height:44px}
+.sport-app #skillStatus{font-size:12px;color:#b4b4bc;margin:6px 0}
+.sport-app .sp{border:1px solid #2f2f33;border-radius:12px;margin:8px 0;background:#19191b;overflow:hidden}
+.sport-app .sp-h{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:48px;padding:10px 14px;background:transparent;border:0;cursor:pointer;font:700 15px Saira,'Noto Sans Arabic',sans-serif;text-align:start}
+.sport-app .sp-h .n{color:var(--mute);font-weight:600;font-size:13px;margin-inline-start:auto;margin-inline-end:8px}
+.sport-app .sp-h .chev{width:10px;height:10px;border-inline-end:2px solid #b8b8c0;border-bottom:2px solid #b8b8c0;transform:rotate(45deg);transition:transform .2s;margin-bottom:3px}
+.sport-app .sp-h[aria-expanded=true] .chev{transform:rotate(-135deg);margin-bottom:-3px}
+.sport-app .sp-list{display:none;padding:0 8px 8px}
+.sport-app .sp.open .sp-list{display:block}
+.sport-app .sp-list button{display:block;width:100%;text-align:start;padding:10px 12px;min-height:44px;border:0;border-radius:8px;background:transparent;cursor:pointer;font:500 14px Saira,'Noto Sans Arabic',system-ui,sans-serif}
+.sport-app .sp-list button:hover{background:#2a2a2d}
+.sport-app .sp-list button[aria-pressed=true]{background:#762620;color:#fff}
+.sport-app button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+/* info panel */
+.sport-app .info{padding:16px;border:1px solid var(--line);border-inline-start:3px solid var(--pri);border-radius:10px;background:#121213;min-height:150px;color:var(--text)}
+.sport-app .info b{font-size:20px;display:block;font-style:italic}
+.sport-app .info>*{opacity:0;animation:li .4s ease forwards;animation-delay:calc(var(--i,0)*110ms)}
 @keyframes li{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.info .sm{color:var(--text);margin:3px 0 0}
-.info small{display:block;color:var(--mute);font-weight:500;font-size:12px}
-.lg{order:2;cursor:pointer;background:#242427;color:var(--text);border:1px solid #4a4a50;border-radius:8px;padding:8px 14px;font:700 14px Saira,'Noto Sans Arabic',sans-serif}
-:root[lang=ar] h1,:root[lang=ar] .info b{font-style:normal;text-transform:none}
-.bn .mb{fill:url(#gb);stroke:#4a3e28;stroke-width:.7}
-.bn .cart{fill:#e3cfd2}
-.disc{fill:#c9bb9a;stroke:#4a3e28;stroke-width:.4}
-.dl{fill:none;stroke:#5e5238;stroke-width:.6;opacity:.65;pointer-events:none;stroke-linecap:round}
-.hl{fill:none;stroke:#fffaf0;stroke-width:.8;opacity:.6;pointer-events:none;stroke-linecap:round}
-.tooth{fill:#f7f5ec;stroke:#8d8470;stroke-width:.4;pointer-events:none}
-.jt{cursor:pointer}
-.lf path{fill:none;stroke:#ffd34a;stroke-width:1.1;stroke-linecap:round;opacity:0;pointer-events:none;transition:opacity .2s;filter:drop-shadow(0 0 1.2px #000)}
-#fig.lfa .lf path{opacity:.7}.lf path.on{opacity:1!important;stroke-width:1.7}
-.jc{fill:rgba(255,255,255,.14);stroke:#ff8a80;stroke-width:1.1;pointer-events:none;transition:fill .2s}
-.jt:hover .jc{fill:rgba(255,138,128,.5)}
-.m.jt.p .jc{fill:#e8372f;stroke:#fff}
-.sock{fill:#15151a;pointer-events:none}
-.lg svg{display:block}
-.by{position:fixed;right:max(14px,env(safe-area-inset-right,0px));bottom:calc(10px + env(safe-area-inset-bottom,0px));font:400 15px 'Mako Kaiju','Mako',sans-serif;color:var(--mute);letter-spacing:.04em;pointer-events:none;z-index:5}
-.bk{fill:none;stroke:#2c2c31;stroke-width:3.4;stroke-linecap:round;pointer-events:none}
-.sct{font:700 9px Saira,'Noto Sans Arabic',sans-serif;fill:#8d8d93;text-anchor:middle;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}
-.lg[aria-pressed=true]{background:var(--pri);border-color:var(--pri);color:#fff}
-:root[lang=ar] .info{direction:rtl;text-align:right;border-left:1px solid var(--line);border-right:3px solid var(--pri)}
-.info{max-height:calc(100vh - 24px);overflow:auto}
-.tag{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:4px;font-size:12px;font-weight:700;color:#111}
-.info p{margin:4px 0 0;color:var(--mute)}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}.info>*{animation:none!important;opacity:1!important}}
-/* the app fills the whole window on every screen (phone, tablet, PC) */
-@media all{
- html,body{height:100%}body{display:block;padding:0;overflow:hidden}
- .card{max-width:none;width:100%;height:100vh;height:100dvh;border:0;border-radius:0;display:flex;flex-direction:column;padding:max(8px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left))}
- h1{font-size:18px;margin:0 0 8px}
- .layout{flex:1;min-height:0;margin-top:8px;grid-template-rows:minmax(0,1fr);align-items:stretch}
- .layout .info{position:static!important;max-height:none;height:100%;overflow:auto}
- .stage{display:flex;flex-direction:column;min-height:0}
- svg{flex:1;min-height:0;height:100%;max-height:none}
- .lbl{flex:none}
- .by{font-size:12px;bottom:calc(2px + env(safe-area-inset-bottom,0px));right:8px}
-}
-@media (min-width:901px){.layout{grid-template-columns:330px 1fr;gap:18px}.card{padding:14px 22px}h1{font-size:22px}.layout .info{font-size:15px}.by{font-size:15px;right:16px;bottom:8px}}
+.sport-app .info p{margin:4px 0 0;color:var(--mute)}
+.sport-app .info .sm{color:var(--text);margin:3px 0 0}
+.sport-app .info small{display:block;color:var(--mute);font-weight:500;font-size:12px}
+.sport-app .tag{display:inline-block;margin-inline-start:8px;padding:1px 8px;border-radius:4px;font-size:12px;font-weight:700;color:#111}
+.sport-app .skill-kicker{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--sec)}
+.sport-app .info .skill-heading{font-size:14px;font-weight:700;color:#ededee;margin-top:16px}
+.sport-app .info ul{padding-inline-start:18px;margin:5px 0;color:#c4c4ca}
+.sport-app .info .muscle-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.sport-app .muscle-list button{border:1px solid #6e3936;background:#2c1d1d;border-radius:5px;color:#ffb6af;padding:6px 8px;min-height:36px;cursor:pointer;font:500 13px Saira,'Noto Sans Arabic',system-ui,sans-serif;text-align:start}
+.sport-app .muscle-list.secondary button{color:#ffd1b3;border-color:#775038;background:#2c241f}
+.sport-app .info .mechanic{border-top:1px solid #333338;padding:7px 0;margin:0}
+.sport-app .mechanic strong{font-size:13px;color:#dedee3}.sport-app .mechanic small{color:#b7b7c0;margin-top:2px}
+.sport-app .info .skill-note{border-inline-start:2px solid #777780;padding:6px 9px;margin-top:12px;font-size:12px;color:#b8b8c1}
+.sport-app .info details{margin-top:14px;font-size:12px;color:#b4b4bc}.sport-app .info summary{cursor:pointer;padding:10px 0;color:#ddd}.sport-app .info a{color:#ffc599;overflow-wrap:anywhere}
+.sport-app .info .force-picture{height:70px;width:100%;margin:8px 0;flex:none}
+.sport-app .steps{margin:6px 0 4px;padding-inline-start:22px;list-style:decimal}.sport-app .steps li{display:list-item;margin:0 0 7px;color:#dedee3;font-size:13px;line-height:1.4}.sport-app .steps strong{display:block;color:#fff}.sport-app .steps span{color:#c4c4cc}
+.sport-app .info[dir="rtl"]{text-align:start}.sport-app .info[dir="rtl"] .steps li,.sport-app .info[dir="rtl"] .skill-note,.sport-app .info[dir="rtl"] p,.sport-app .info[dir="rtl"] small{line-height:1.8}
+.sport-app.is-ar .info{border-inline-start:1px solid var(--line);border-inline-end:3px solid var(--pri)}
+@media(max-width:820px){.sport-app .layout{display:flex;flex-direction:column;gap:12px}.sport-app .stage{order:0}.sport-app .info{order:1}.sport-app .tools{gap:6px}.sport-app .lg{padding:8px 10px}}
+@media(max-width:600px){.sport-app{padding:6px}.sport-app .card{padding:10px}.sport-app #fig{aspect-ratio:auto;height:340px}.sport-app h1{font-size:15px}.sport-app .menu .menu-t{display:none}}
+@media (prefers-reduced-motion:reduce){.sport-app *{transition:none!important}.sport-app .info>*{animation:none!important;opacity:1!important}}
+/* figure */
+.sport-app .guide{stroke:#55555b;stroke-width:1;stroke-dasharray:2 3;fill:none}
+.sport-app .bo{fill:none;stroke:#3a3a3f;stroke-width:3.2;stroke-linejoin:round}
+.sport-app .bf{fill:#1e1e21;stroke:none}
+.sport-app .mb{fill:url(#gn);stroke:rgba(10,10,12,.75);stroke-width:.7;stroke-linejoin:round;transition:fill .2s}
+.sport-app .sh,.sport-app .fg{pointer-events:none}
+.sport-app .fs{fill:none;stroke-linecap:round}
+.sport-app .fs.d{stroke:rgba(8,8,10,.4);stroke-width:.55}.sport-app .fs.l{stroke:rgba(255,225,215,.2);stroke-width:.5}.sport-app .fs.b{stroke:rgba(8,8,10,.55);stroke-width:1.1}
+.sport-app .m{cursor:pointer;outline:none}
+.sport-app .m:hover .mb{filter:brightness(1.25)}
+.sport-app .m.p .mb{fill:url(#gp)}.sport-app .m.s .mb{fill:url(#gs)}
+.sport-app .m[data-m=tendon] .mb{fill:url(#gt);stroke:#6f6652;stroke-width:.5}
+.sport-app .m.p{filter:drop-shadow(0 0 5px rgba(232,55,47,.6))}
+.sport-app .m.s{filter:drop-shadow(0 0 4px rgba(253,163,106,.4))}
+.sport-app .m.sel .mb,.sport-app .m:focus-visible .mb{stroke:#fff;stroke-width:1.8}
+.sport-app #fig.skill-mode:not(.sk-on) .m:not(.p):not(.s):not(.jt){opacity:.6}
+.sport-app .dt{opacity:0;pointer-events:none;transition:opacity .45s .35s}
+.sport-app .dt.on{opacity:1}
+.sport-app .dt path{stroke:rgba(255,255,255,.4);stroke-width:.7;fill:none;stroke-linecap:round}
+.sport-app .dt .ld{stroke:#fff;stroke-width:.45;opacity:.85}
+.sport-app .dt text{font:700 6.5px Saira,'Noto Sans Arabic',sans-serif;fill:#fff;paint-order:stroke;stroke:#000;stroke-width:1.8px;stroke-linejoin:round}
+.sport-app .bn .mb{fill:url(#gb);stroke:#4a3e28;stroke-width:.7}
+.sport-app .bn .cart{fill:#e3cfd2}
+.sport-app .disc{fill:#c9bb9a;stroke:#4a3e28;stroke-width:.4}
+.sport-app .dl{fill:none;stroke:#5e5238;stroke-width:.6;opacity:.65;pointer-events:none;stroke-linecap:round}
+.sport-app .hl{fill:none;stroke:#fffaf0;stroke-width:.8;opacity:.6;pointer-events:none;stroke-linecap:round}
+.sport-app .tooth{fill:#f7f5ec;stroke:#8d8470;stroke-width:.4;pointer-events:none}
+.sport-app .sock{fill:#1c1a14;pointer-events:none}
+.sport-app .bk{fill:none;stroke:#303034;stroke-width:3.4;stroke-linecap:round;pointer-events:none}
+.sport-app .sct{font:700 9px Saira,'Noto Sans Arabic',sans-serif;fill:#8d8d93;text-anchor:middle;letter-spacing:.08em;text-transform:uppercase;pointer-events:none}
+.sport-app .jt{cursor:pointer}
+.sport-app .lf path{fill:none;stroke:#ffd34a;stroke-width:1.1;stroke-linecap:round;opacity:0;pointer-events:none;transition:opacity .2s;filter:drop-shadow(0 0 1.2px #000)}
+.sport-app #fig.lfa .lf path{opacity:.7}.sport-app .lf path.on{opacity:1!important;stroke-width:1.7}
+.sport-app #fig.skill-mode .lf path{opacity:0}
+.sport-app #fig.skill-mode.lfa .lf path.on{opacity:.9}
+.sport-app #fig.skill-mode:not(.lfa) .lf path.on{opacity:0!important}
+.sport-app .jc{fill:rgba(255,255,255,.14);stroke:#ff8a80;stroke-width:1.1;pointer-events:none;transition:fill .2s}
+.sport-app .jt:hover .jc{fill:rgba(255,138,128,.5)}
+.sport-app .m.jt.p .jc{fill:#e8372f;stroke:#fff}
 
-/* Skill explorer: local library, no uploads or sign-in. */
-.skill-search{margin-top:12px;position:relative;flex:none}
-.skill-search label{display:block;font-size:14px;font-weight:700;margin-bottom:5px}
-.search-row{display:flex;gap:8px}
-#skillQuery{width:100%;min-width:0;border:1px solid #52525b;background:#101011;color:#fff;border-radius:8px;padding:11px 12px;font:500 16px Saira,system-ui,sans-serif}
-#skillQuery:focus{outline:2px solid var(--sec);outline-offset:1px}
-#clearSkill{background:#242427;color:#eee;border:1px solid #52525b;border-radius:8px;padding:8px 14px;font:700 14px Saira,sans-serif;cursor:pointer;min-height:44px}
-.skill-results{display:flex;flex-wrap:wrap;gap:6px;max-height:108px;overflow:auto;padding:6px 0 2px}
-.skill-results button{border:1px solid #44444a;border-radius:6px;background:#222225;color:#eee;padding:9px 11px;min-height:44px;cursor:pointer;font:500 14px Saira,system-ui,sans-serif;text-align:start}
-.skill-results button[aria-pressed=true]{background:#762620;border-color:#ff7466}
-.skill-results button:focus-visible,#clearSkill:focus-visible{outline:2px solid var(--sec);outline-offset:1px}
-#skillStatus{font-size:12px;color:#b4b4bc;margin:3px 0}
-.skill-kicker{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--sec)}
-.info .skill-heading{font-size:14px;font-weight:700;color:#ededee;margin-top:16px}
-.info ul{padding-inline-start:18px;margin:5px 0;color:#c4c4ca}
-.info .muscle-list{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
-.muscle-list button{border:1px solid #6e3936;background:#2c1d1d;border-radius:5px;color:#ffb6af;padding:6px 8px;min-height:36px;cursor:pointer;font:500 13px Saira,system-ui,sans-serif;text-align:start}
-.muscle-list.secondary button{color:#ffd1b3;border-color:#775038;background:#2c241f}
-.info .mechanic{border-top:1px solid #333338;padding:7px 0;margin:0}
-.mechanic strong{font-size:13px;color:#dedee3}.mechanic small{color:#b7b7c0;margin-top:2px}
-.info .skill-note{border-left:2px solid #777780;padding:6px 9px;margin-top:12px;font-size:12px;color:#b8b8c1}
-.info details{margin-top:14px;font-size:12px;color:#b4b4bc}.info summary{cursor:pointer;padding:10px 0;color:#ddd}.info a{color:#ffc599;overflow-wrap:anywhere}
-.info .force-picture{height:70px;width:100%;margin:8px 0;flex:none}
-#fig.skill-mode .lf path{opacity:0}
-#fig.skill-mode.lfa .lf path.on{opacity:.9}
-#fig.skill-mode:not(.lfa) .lf path.on{opacity:0!important}
-@media(max-width:640px){
- html,body{height:auto;min-height:100%;overflow:auto}
- .card{height:auto;min-height:100dvh;display:block;padding:12px}
- .layout{display:flex;flex-direction:column;gap:12px}
- .stage{width:100%;height:370px;order:0;border:1px solid #303036;border-radius:8px}
- .stage #fig{height:340px;min-height:0;flex:1}
- .layout .info{order:1;width:100%;height:auto;max-height:none;overflow:visible;font-size:14px;padding:14px}
- .layout .info b{font-size:22px}
- .bar{gap:8px}.seg button{padding:8px 12px}.lg{padding:8px 10px}
- .skill-results{max-height:104px}.by{position:static;text-align:right;padding:8px 14px}
- .legend{margin-top:8px!important}.info .force-picture{height:70px}
-}
+@media(max-width:430px){.sport-app #menuLabel,.sport-app #title{display:none}.sport-app .layout{display:flex;flex-direction:column}.sport-app .layout .info,.sport-app .stage{width:100%;max-width:none;box-sizing:border-box}.sport-app .topbar h1,.sport-app h1{font-size:16px}}
 
-.steps{margin:6px 0 4px;padding-left:22px}.steps li{margin:0 0 7px;color:#dedee3;font-size:13px;line-height:1.4}.steps strong{display:block;color:#fff}.steps span{color:#c4c4cc}.sport-chip{font-weight:700}
+.sport-app .bn{filter:url(#bonelit)}
 
-.info[dir="rtl"]{text-align:start}.info[dir="rtl"] .steps{padding-left:0;padding-right:22px}.info[dir="rtl"] .steps li{line-height:1.8}.info[dir="rtl"] .skill-note,.info[dir="rtl"] p,.info[dir="rtl"] small{line-height:1.8}.info a{overflow-wrap:anywhere}
-</style>
-</head>
-<body>
-<main class="card">
-  <h1 id="title">Muscle map</h1>
+.sport-app{display:block;border-radius:10px;padding:12px;color-scheme:dark;overflow:hidden}
+</style></head><body><div class="sport-app">
+<main class="card" id="card">
+  <div class="topbar">
+    <button class="lg menu" id="menu" aria-expanded="false" aria-controls="side"><svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round'><path d='M4 7h16M4 12h16M4 17h16'/></svg><span class="menu-t" id="menuLabel">Sports</span></button>
+    <h1 id="title">Muscle map</h1>
+    <div class="tools"><button class="lg" id="fs" aria-label="Full screen" title="Full screen" hidden><svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'/></svg></button><button class="lg" id="fl" aria-label="Line of force" title="Line of force" aria-pressed="true"><svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 19L19 5M10 5h9v9'/></svg></button><button class="lg" id="sk" aria-label="Skeleton" aria-pressed="false"><svg viewBox='0 0 24 24' width='22' height='22' fill='currentColor'><path d='M12 2C7 2 3.5 5.6 3.5 10c0 2.6 1.2 4.6 3 5.8V20h3v-2h1v2h2v-2h1v2h3v-4.2c1.8-1.2 3-3.2 3-5.8C20.5 5.6 17 2 12 2zM8.5 12.5a2 2 0 110-4 2 2 0 010 4zm7 0a2 2 0 110-4 2 2 0 010 4zM12 14l-1.2 2h2.4z'/></svg></button><button class="lg" id="lang">AR</button></div>
+  </div>
   <div class="bar">
-    <div style="order:2;display:flex;gap:8px"><button class="lg" id="fs" aria-label="Full screen" title="Full screen" hidden><svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5'/></svg></button><button class="lg" id="fl" aria-label="Line of force" title="Line of force" aria-pressed="true"><svg viewBox='0 0 24 24' width='22' height='22' fill='none' stroke='currentColor' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'><path d='M5 19L19 5M10 5h9v9'/></svg></button><button class="lg" id="sk" aria-label="Skeleton" aria-pressed="false"><svg viewBox='0 0 24 24' width='22' height='22' fill='currentColor'><path d='M12 2C7 2 3.5 5.6 3.5 10c0 2.6 1.2 4.6 3 5.8V20h3v-2h1v2h2v-2h1v2h3v-4.2c1.8-1.2 3-3.2 3-5.8C20.5 5.6 17 2 12 2zM8.5 12.5a2 2 0 110-4 2 2 0 010 4zm7 0a2 2 0 110-4 2 2 0 010 4zM12 14l-1.2 2h2.4z'/></svg></button><button class="lg" id="lang">AR</button></div>
     <div class="seg" role="group" aria-label="View">
       <button data-v="f" aria-pressed="false">Front</button>
       <button data-v="b" aria-pressed="false">Back</button>
       <button data-v="both" aria-pressed="true">Both</button>
     </div>
-    
+    <div class="legend"><span><i style="background:var(--pri)"></i>Primary</span><span><i style="background:var(--sec)"></i>Secondary</span></div>
   </div>
-
-<section class="skill-search" aria-label="Sports skill search">
- <label id="skillLabel" for="skillQuery">Search sports skills</label>
- <div class="search-row"><input type="search" id="skillQuery" placeholder="Try jab, serve, long jump..." autocomplete="off" aria-controls="skillResults" aria-describedby="skillStatus"><button id="clearSkill" type="button">Clear</button></div>
- <p id="skillStatus" role="status" aria-live="polite"></p>
- <div class="skill-results" id="skillResults" role="group" aria-label="Matching skills"></div>
-</section>
-  <div class="legend" style="margin-top:12px"><span><i style="background:var(--pri)"></i>Primary</span><span><i style="background:var(--sec)"></i>Secondary</span></div>
-  <div class="layout"><aside class="info" id="info" aria-live="polite"></aside><div class="stage"><button class="zr" id="zr" hidden>Reset view</button>
-  <svg id="fig" viewBox="0 0 800 740" role="img" aria-label="Muscle map, front and back">
-    <defs>
-      <radialGradient id="gn" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#707076"/><stop offset=".55" stop-color="#45454c"/><stop offset="1" stop-color="#242429"/></radialGradient>
-      <radialGradient id="gp" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ff7466"/><stop offset=".55" stop-color="#e0352c"/><stop offset="1" stop-color="#7d0d09"/></radialGradient>
-      <radialGradient id="gs" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ffcb9c"/><stop offset=".55" stop-color="#fd9a55"/><stop offset="1" stop-color="#a84a0c"/></radialGradient>
-    </defs>
-    <g id="views"></g><g id="skel" style="display:none"></g>
-  </svg>
-  <div class="lbl"><span>FRONT</span><span>BACK</span></div>
-  </div></div>
+  <div class="shell">
+    <div class="scrim" id="scrim"></div>
+    <aside class="side" id="side" aria-label="Sports and search">
+      <div class="side-in">
+        <div class="side-head"><b id="sideTitle">Sports and search</b><button type="button" id="sideClose" aria-label="Close">&times;</button></div>
+        <section class="skill-search" aria-label="Sports skill search">
+          <label id="skillLabel" for="skillQuery">Search sports skills</label>
+          <div class="search-row"><input type="search" id="skillQuery" placeholder="Try jab, serve, long jump..." autocomplete="off" aria-controls="skillResults" aria-describedby="skillStatus"><button id="clearSkill" type="button">Clear</button></div>
+          <p id="skillStatus" role="status" aria-live="polite"></p>
+          <div id="skillResults" role="group" aria-label="Sports"></div>
+        </section>
+      </div>
+    </aside>
+    <div class="layout"><aside class="info" id="info" aria-live="polite"></aside><div class="stage"><button class="zr" id="zr" hidden>Reset view</button>
+      <svg id="fig" viewBox="0 0 800 740" role="img" aria-label="Muscle map, front and back">
+        <defs>
+          <radialGradient id="gn" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#c4c4ca"/><stop offset=".55" stop-color="#8e8e95"/><stop offset="1" stop-color="#4a4a50"/></radialGradient>
+          <radialGradient id="gp" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ff7466"/><stop offset=".55" stop-color="#e5372d"/><stop offset="1" stop-color="#8e100c"/></radialGradient>
+          <radialGradient id="gs" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#ffcb9c"/><stop offset=".55" stop-color="#fd9a55"/><stop offset="1" stop-color="#b4510f"/></radialGradient>
+        </defs>
+        <g id="views"></g><g id="skel" style="display:none"></g>
+      </svg>
+      <div class="lbl"><span>FRONT</span><span>BACK</span></div>
+    </div></div>
+  </div>
+  <footer class="by">made by Tito</footer>
 </main>
-<footer class="by">made by Tito</footer>
-<script>
+</div><script>// @ts-nocheck
+(function(){
+/* ===== anatomy drawing kit: smooth organic shapes ===== */
+const f1=v=>(Math.round(v*10)/10).toString(),pt=p=>f1(p[0])+','+f1(p[1]);
+const SHAPES=[];
+function blobD(pts,k){k=k||1;const n=pts.length;let d='M'+pt(pts[0]);
+ for(let i=0;i<n;i++){const p0=pts[(i-1+n)%n],p1=pts[i],p2=pts[(i+1)%n],p3=pts[(i+2)%n];
+  d+='C'+pt([p1[0]+(p2[0]-p0[0])/6*k,p1[1]+(p2[1]-p0[1])/6*k])+' '+pt([p2[0]-(p3[0]-p1[0])/6*k,p2[1]-(p3[1]-p1[1])/6*k])+' '+pt(p2)}
+ return d+'Z'}
+function crs(P,n){const o=[];for(let i=0;i<P.length-1;i++){const p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||P[i+1];
+  for(let t=0;t<n;t++){const s=t/n,s2=s*s,s3=s2*s;o.push([0,1].map(k=>.5*(2*p1[k]+(-p0[k]+p2[k])*s+(2*p0[k]-5*p1[k]+4*p2[k]-p3[k])*s2+(-p0[k]+3*p1[k]-3*p2[k]+p3[k])*s3)))}}
+ o.push(P[P.length-1]);return o}
+/* centreline sampling with interpolated half-widths: returns [{x,y,nx,ny,w,u}] */
+function spine(P,W,n){const Q=crs(P,n||8),N=Q.length,L=[0];for(let i=1;i<N;i++)L.push(L[i-1]+Math.hypot(Q[i][0]-Q[i-1][0],Q[i][1]-Q[i-1][1]));
+ const tot=L[N-1]||1;
+ // widths are given per control point; control points sit at index i*(n||8)
+ const step=n||8;
+ return Q.map((p,i)=>{const a=Q[Math.max(0,i-1)],b=Q[Math.min(N-1,i+1)];let dx=b[0]-a[0],dy=b[1]-a[1];const l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;
+  const g=i/step,k=Math.min(W.length-2,Math.floor(g)),t=Math.min(1,g-k),s=t*t*(3-2*t);
+  const w=W[k]+(W[Math.min(W.length-1,k+1)]-W[k])*s;
+  return {x:p[0],y:p[1],nx:-dy,ny:dx,w,u:L[i]/tot}})}
+function bandPts(P,W){const S=spine(P,W,8),Lp=[],Rp=[];
+ S.forEach((s,i)=>{if(i%2&&i<S.length-1)return;Lp.push([s.x+s.nx*s.w,s.y+s.ny*s.w]);Rp.push([s.x-s.nx*s.w,s.y-s.ny*s.w])});
+ const a=S[0],z=S[S.length-1];let pts=[];
+ if(W[0]<.9){pts.push([a.x,a.y]);Lp.shift();Rp.shift()}
+ pts=pts.concat(Lp);
+ if(W[W.length-1]<.9){pts.pop();pts.push([z.x,z.y])}
+ const Rr=Rp.slice().reverse();if(W[W.length-1]<.9)Rr.shift();
+ return pts.concat(Rr)}
+/* shape constructors; meta kept in SHAPES, referenced by data-i */
+const Bd=(P,W,o)=>{const m=Object.assign({t:'b',P,W},o||{});m.ol=bandPts(P,W);m.d=blobD(m.ol,1);SHAPES.push(m);return SHAPES.length-1};
+const Fl=(pts,o)=>{const m=Object.assign({t:'f',pts},o||{});m.ol=pts;m.d=blobD(pts,m.k||1);SHAPES.push(m);return SHAPES.length-1};
+const Tn=(P,W)=>Bd(P,W,{tn:1});
+const Tf=(pts)=>Fl(pts,{tn:1});
+/* ===== superficial and deep muscles (left half of each view; the right half mirrors the deep layer) ===== */
+const NF=[],NB=[],NDF=[],NDB=[];
+const thighC=y=>154+.05*(y-400);
+// ---- FRONT, superficial ----
+NF.push(
+['tendon',[
+ Fl([[183,206],[200,204],[200,322],[192,326],[184,300],[182,250]],{dir:90}),                       // linea alba and abdominal sheath
+ Tn([[124,370],[119,420],[123,470],[134,512]],[2.6,2.6,2.6,2.6]),                                    // iliotibial band
+ Tn([[160,514],[160,524],[160,530]],[5,4.5,4]),                                                      // quadriceps tendon
+ Fl([[152,530],[160,526],[168,530],[169,542],[160,550],[151,542]],{dir:90,k:1}),                     // patella
+ Tn([[160,548],[160,562],[159,576]],[3.4,2.8,2.4]),                                                  // patellar tendon
+ Tn([[160,678],[160,690],[160,700]],[4,3.2,2.8]),                                                    // ankle tendons
+ Tn([[104,300],[104,308],[103,318]],[3,2.5,2]),                                                      // biceps tendon
+ Tn([[94,372],[88,392],[80,404]],[3,2,1.6]),Tn([[86,374],[80,392],[74,408]],[2.4,1.8,1.4])           // wrist tendons
+]],
+['sartorius',[Bd([[142,349],[158,388],[172,438],[180,488],[178,526]],[1.5,3.4,3.6,3.2,2])]],
+['quads',[
+ Bd([[134,394],[133,430],[137,468],[144,498],[152,516]],[3,12.4,14.4,9.6,2.6],{seam:1}),                  // vastus lateralis
+ Bd([[151,372],[155,410],[159,456],[161,500],[161,516]],[2.4,10,11.6,9,3.2]),                          // rectus femoris
+ Bd([[168,446],[177,474],[178,500],[169,520]],[1.5,9,11,2.2])                                       // vastus medialis
+]],
+['adductors',[Bd([[198,422],[190,452],[182,480],[176,504]],[3,10.5,7.4,2]),Bd([[198,444],[196,484],[190,516],[184,542]],[2,3.2,2.6,1.5])]],
+['hipflex',[Bd([[136,346],[131,370],[129,396]],[3,7,3]),Bd([[186,330],[178,358],[170,390]],[3,5.5,2.5])]],
+['calves',[
+ Bd([[148,550],[152,590],[158,640],[164,678]],[3,8.6,6,2.2]),                                          // tibialis anterior
+ Bd([[139,556],[135,590],[139,630],[147,672]],[2.5,7.4,5.4,1.6]),                                    // peroneals
+ Bd([[170,556],[178,584],[177,620],[168,650]],[2,8.8,7.2,1.6])                                         // medial gastrocnemius
+]],
+['obliques',[
+ Fl([[178,216],[162,216],[148,226],[141,246],[140,272],[146,298],[158,320],[170,330],[178,318],[181,290],[182,256],[182,230]],{dir:62,fan:[[150,218,178,214],[160,322,184,246]]}),
+ ...[0,1,2,3,4].map(i=>Bd([[124+i*.8,192+i*11],[136+i*.6,199+i*11],[148+i*.4,207+i*11]],[1,4.1-i*.15,1.4]))
+]],
+['abs',[[0,1,2,3].map(i=>{const y=[208,232,257,282][i],h=[22,23,23,24][i],x0=[181,183,184,186][i],w=200-x0-.8;
+   return Fl([[x0+w*.5,y-.8],[x0+w,y+2],[x0+w+.4,y+h*.5],[x0+w,y+h-1],[x0+w*.5,y+h+.6],[x0+1,y+h-1.6],[x0-.4,y+h*.5],[x0+1,y+2.4]].map(p=>p),{dir:90,k:.9})})].flat()],
+['chest',[Fl([[199,136],[183,132],[164,136],[148,144],[134,156],[124,172],[123,186],[133,197],[150,206],[170,212],[188,211],[199,203]],{fan:[[198,136,198,204],[126,176,134,164]],seam:1})]],
+['delt-f',[Fl([[140,128],[126,127],[108,138],[95,157],[90,182],[92,206],[98,226],[110,216],[122,198],[131,176],[138,150]],{dir:112,fan:[[142,128,132,130],[96,224,108,222]]})]],
+['traps',[
+ Fl([[199,112],[190,110],[176,116],[158,122],[143,126],[136,132],[150,142],[168,139],[184,134],[198,127]],{dir:170}),
+ Bd([[180,78],[188,96],[196,119]],[1.1,3.8,2.6],{})
+]],
+['biceps',[Bd([[116,214],[108,236],[103,262],[101,288],[103,302]],[1,7.8,9.2,6.4,2])]],
+['triceps',[Bd([[100,226],[91,246],[88,270],[90,294],[94,304]],[1,4.6,5.6,4.2,1.5])]],
+['forearms',[
+ Bd([[106,306],[98,330],[90,358],[82,386]],[5.5,8.2,5.4,2.2]),
+ Bd([[94,304],[85,326],[77,352],[70,384]],[4.2,7.4,4.8,2]),
+ Fl([[64,396],[75,392],[88,396],[94,412],[92,432],[82,442],[68,440],[60,428],[58,410]],{dir:90})
+]],
+['face',[
+ Fl([[200,26],[186,28],[178,38],[181,46],[200,44]],{dir:0}),
+ Fl([[181,54],[185,48],[192,47],[197,51],[195,57],[188,59]],{dir:20,k:1}),
+ Fl([[200,73],[194,73],[190,76],[194,80],[200,80]],{dir:0}),
+ Bd([[182,62],[188,69],[195,74]],[1.2,2.4,1.4]),
+ Fl([[177,62],[184,64],[187,76],[183,86],[177,80]],{dir:100}),
+ Fl([[175,42],[181,38],[184,50],[181,60],[175,55]],{dir:80})
+]]
+);
+// thumb and fingers (pale tendon tone), added to the tendon group
+NF[0][1].push(
+ Tn([[66,430],[62,450],[61,468]],[3.1,2.6,2.1]),Tn([[73,436],[72,458],[71,476]],[3.2,2.7,2.2]),
+ Tn([[80,436],[81,458],[82,472]],[3.1,2.6,2.1]),Tn([[87,432],[90,448],[92,460]],[2.8,2.3,1.9]),
+ Tn([[62,404],[53,422],[49,440]],[3.6,3,2.2]));
+// ---- BACK, superficial ----
+NB.push(
+['tendon',[
+ Tn([[160,628],[160,662],[160,698]],[4.2,2.6,2.4]),Tn([[102,210],[100,260],[100,302]],[1.5,1.2,2.8]),
+ Fl([[199,252],[190,250],[188,300],[188,332],[199,334]],{dir:90}),
+ Tn([[94,372],[88,392],[80,404]],[3,2,1.6]),Tn([[86,374],[80,392],[74,408]],[2.4,1.8,1.4]),
+ Tn([[66,430],[62,450],[61,468]],[3.1,2.6,2.1]),Tn([[73,436],[72,458],[71,476]],[3.2,2.7,2.2]),
+ Tn([[80,436],[81,458],[82,472]],[3.1,2.6,2.1]),Tn([[87,432],[90,448],[92,460]],[2.8,2.3,1.9]),
+ Tn([[62,404],[53,422],[49,440]],[3.6,3,2.2])
+]],
+['lats',[Fl([[152,202],[138,207],[124,215],[127,238],[133,262],[141,290],[155,316],[175,329],[186,326],[188,300],[187,262],[180,236],[168,210]],{dir:55,fan:[[176,328,196,260],[124,216,134,208]]})]],
+['lowback',[Bd([[191,176],[192,230],[191,290],[188,332]],[3,6.4,7.4,4.6])]],
+['obliques',[Fl([[142,298],[133,316],[134,336],[148,334],[156,316]],{dir:60})]],
+['glutes',[
+ Fl([[199,337],[184,331],[165,327],[147,333],[135,350],[130,376],[138,404],[154,420],[176,422],[196,414],[199,380]],{dir:35,fan:[[198,336,150,330],[132,396,176,420]],seam:1}),
+ Fl([[148,324],[134,336],[130,356],[142,368],[158,352],[168,334]],{dir:40})
+]],
+['hams',[
+ Bd([[168,424],[150,452],[143,484],[144,516]],[4,11,9.5,3.2]),
+ Bd([[181,424],[179,456],[173,488],[167,518]],[4,12,10.5,3.4])
+]],
+['calves',[
+ Bd([[174,538],[177,568],[174,608],[165,638]],[2.5,13,11,2.2]),
+ Bd([[146,542],[143,572],[147,608],[155,634]],[2.5,10.5,9,2.2]),
+ Bd([[149,640],[146,656],[149,672],[156,682]],[2.5,6.5,5.6,2.4])
+]],
+['triceps',[Bd([[120,200],[110,230],[102,262],[100,292]],[3.4,9.4,10,5.4],{seam:1}),Bd([[104,218],[92,240],[88,266],[92,292]],[1.5,5.2,6.2,3.2])]],
+['forearms',[
+ Bd([[96,306],[86,332],[78,360],[72,386]],[4.8,8.8,6.2,2.4]),Bd([[108,306],[102,330],[92,358],[84,386]],[3.4,7.2,5.6,2.2]),
+ Fl([[64,396],[75,392],[88,396],[94,412],[92,432],[82,442],[68,440],[60,428],[58,410]],{dir:90})
+]],
+['delt-r',[Fl([[140,134],[121,137],[103,148],[93,168],[90,194],[98,222],[112,214],[128,196],[140,176],[143,150]],{dir:112,fan:[[142,136,136,150],[96,224,108,222]]})]],
+['rotator',[
+ Fl([[142,152],[166,158],[170,176],[163,198],[146,201],[136,180]],{dir:15,fan:[[150,154,148,198],[132,168,134,190]]}),
+ Bd([[142,198],[129,212],[118,233]],[2.4,5.8,2.4])
+]],
+['traps',[
+ Fl([[200,86],[188,90],[177,104],[159,120],[142,130],[133,138],[147,160],[166,186],[185,220],[198,256],[199,150]],{dir:60,fan:[[199,86,198,255],[134,138,142,128]],seam:1}),
+ Bd([[181,80],[187,92],[195,108]],[1.5,4,2.8])
+]]
+);
+// ---- FRONT, deep ----
+NDF.push(
+['int-obl',[Fl([[184,232],[166,234],[150,248],[146,272],[152,300],[166,320],[180,324],[184,290]],{dir:100})]],
+['serratus',[0,1,2,3,4,5,6,7].map(i=>Bd([[126+i*1.4,150+i*13.5],[139+i*1.2,157+i*13.5],[151+i*1,165+i*13.5]],[1,4.4,1.5]))],
+['pec-minor',[Bd([[134,142],[148,158],[162,176]],[2,5.4,3])]],
+['psoas',[Bd([[190,318],[182,356],[170,390],[158,414]],[4,6.8,5.2,2.4]),Fl([[176,332],[158,336],[150,356],[160,372],[176,364]],{dir:100})]],
+['vast-int',[Bd([[152,400],[155,450],[159,500],[160,516]],[4,9.4,9,3])]],
+['adductors-d',[Fl([[198,430],[190,436],[180,470],[174,502],[184,508],[196,472]],{dir:100}),Bd([[178,356],[174,372],[176,396]],[2.5,3.8,2])]],
+['calves',[Bd([[150,560],[154,600],[160,650],[164,680]],[3,6.4,4.2,2]),Bd([[166,566],[172,600],[169,640]],[2,5.2,3])]],
+['forearm-deep',[Bd([[104,312],[96,340],[88,366],[80,386]],[3,6.4,4.2,1.8]),Bd([[92,310],[84,334],[78,358],[72,380]],[2.4,5.2,3.4,1.6])]],
+['brachialis',[Bd([[104,252],[100,276],[100,296],[104,306]],[3,6.2,5,2])]],
+['coraco',[Bd([[134,166],[122,190],[112,214]],[2,4.6,2])]],
+['bicep-l',[Bd([[130,146],[110,190],[100,250],[97,296]],[1.5,3.6,4.6,3.2])]],
+['bicep-s',[Bd([[137,150],[119,194],[108,252],[104,298]],[1.5,3.8,4.8,3.2])]],
+['tendon',[Tn([[126,142],[112,186],[100,228]],[1.2,1.2,1.2]),Tn([[134,146],[120,190],[106,230]],[1.2,1.2,1.2]),Tn([[102,296],[103,306],[102,316]],[2.6,2.2,1.8])]]
+);
+// ---- BACK, deep ----
+NDB.push(
+['adductors-d',[Fl([[196,420],[186,432],[180,466],[184,500],[196,508]],{dir:90})]],
+['soleus',[Bd([[148,566],[142,592],[146,622],[154,650],[166,664]],[3,9,10,6,2]),Bd([[170,566],[178,592],[176,624],[168,654]],[3,9,8,2])]],
+['forearm-deep',[Bd([[106,312],[98,338],[90,362],[82,386]],[3.5,6.2,4.4,1.8]),Bd([[92,310],[84,336],[78,360],[72,382]],[2.4,5.6,3.6,1.6])]],
+['glute-deep',[Fl([[180,326],[160,320],[142,328],[135,346],[140,366],[160,374],[186,372]],{dir:20}),Bd([[194,380],[172,382],[152,394]],[3,3.6,2.4])]],
+['ql',[Bd([[188,296],[178,312],[172,336]],[3.2,5,3])]],
+['rhomb',[Fl([[198,132],[172,140],[152,168],[170,186],[198,172]],{dir:150})]],
+['supra',[Bd([[172,140],[154,134],[134,140]],[3,5,2.4])]],
+['infra',[Fl([[172,158],[156,156],[142,158],[134,170],[136,196],[168,200],[174,180]],{dir:10}),Bd([[134,198],[138,208],[146,214]],[3,3.6,2.4])]],
+['tri-long',[Bd([[124,198],[112,228],[106,262],[104,300]],[3,7.6,7.4,3])]],
+['tri-lat',[Bd([[102,224],[91,248],[88,274],[92,300]],[1.5,5.2,5.6,2.4])]],
+['tri-med',[Bd([[102,262],[99,282],[100,302]],[3,5.4,2.4])]],
+['tendon',[Tn([[166,634],[170,664],[170,696]],[5,3.4,3]),Tn([[152,520],[158,530],[156,546]],[3,3.4,2.4])]]
+);
+/* ===== body silhouette (dark ground that shows between muscles) ===== */
+const BASEP=[
+ blobD([[200,98],[188,100],[186,114],[164,121],[142,124],[120,132],[102,146],[92,168],[90,194],[98,222],[120,226],[126,252],[136,284],[140,308],[132,336],[124,362],[134,400],[170,420],[200,436]],1),
+ blobD([[100,160],[90,186],[84,230],[84,290],[84,306],[76,332],[66,366],[58,394],[88,402],[96,372],[108,336],[114,304],[116,250],[120,214]],1),
+ blobD([[60,392],[90,400],[96,418],[94,438],[84,448],[68,446],[58,430],[57,408]],1),
+ blobD([[136,350],[124,392],[121,432],[124,470],[132,508],[135,534],[131,568],[129,602],[135,640],[141,676],[174,676],[178,640],[183,600],[185,566],[185,534],[187,500],[192,464],[198,430],[200,380]],1),
+ blobD([[139,672],[135,700],[132,718],[140,728],[168,729],[178,722],[177,700],[176,672]],1),
+ blobD([[200,84],[187,86],[185,100],[188,118],[200,124]],1),
+ ...[[[[66,430],[62,450],[61,468]],[5.2,4.6,3.8]],[[[73,436],[72,458],[71,476]],[5.2,4.6,3.8]],[[[80,436],[81,458],[82,472]],[5.2,4.6,3.8]],[[[87,432],[90,448],[92,460]],[4.8,4.2,3.4]],[[[62,404],[53,422],[49,440]],[5.6,4.6,3.6]]].map(([P,W])=>blobD(bandPts(P,W),1))
+];
+const BASE=BASEP.map(d=>`<path class="bo" d="${d}"/>`).join('')+BASEP.map(d=>`<path class="bf" d="${d}"/>`).join('');
+const KNEE='',FING='';
+const HEAD='<path class="bo" d="M200,19C214,19 224,28 226,42C228,52 227,60 224,70C221,80 212,91 200,93C188,91 179,80 176,70C173,60 172,52 174,42C176,28 186,19 200,19Z"/><path class="bf" d="M200,19C214,19 224,28 226,42C228,52 227,60 224,70C221,80 212,91 200,93C188,91 179,80 176,70C173,60 172,52 174,42C176,28 186,19 200,19Z"/><path class="bf" d="M174,50C168,50 168,64 174,66ZM226,50C232,50 232,64 226,66Z"/><path class="guide" d="M200,22V90"/>';
+
+
 /* ---------- muscle data (left half only; the right half is mirrored) ---------- */
 const forearm='M82,308 C74,330 70,360 66,392 L82,394 C90,370 98,340 104,310 Z';
 const absRows=[214,240,266,292].map(y=>`M185,${y+2}Q192,${y-1} 199,${y+2}V${y+22}Q192,${y+25} 185,${y+22}Z`);
@@ -204,14 +374,6 @@ const BACK=[
  ['delt-r',80,['M138,136 C120,142 98,150 92,172 C88,192 92,208 100,224 C114,216 130,196 142,176 C140,160 138,148 138,136 Z']],
  ['traps',60,['M199,108 L187,112 C170,122 152,130 138,136 C152,166 178,204 199,250 Z']]
 ];
-const BASE='<path class="base" d="M200,108 L148,124 C128,134 118,150 116,172 C116,210 132,262 142,300 C146,330 132,350 130,384 L200,410 Z"/>'+
-'<path class="base" d="M97,146 C84,170 78,208 80,250 L72,312 C66,350 60,386 58,398 L86,398 C100,352 114,300 116,262 C118,226 120,190 130,160 Z"/>'+
-'<path class="base" d="M66,394 C60,412 58,428 62,440 C68,444 76,434 80,420 L84,396 Z"/>'+
-'<path class="base" d="M200,346 L132,356 C120,420 122,480 132,522 C128,566 128,626 140,674 L172,674 C177,626 176,576 180,540 L200,516 Z"/>'+
-'<path class="base" d="M138,672 C130,692 128,708 134,716 L178,716 C178,700 174,684 172,672 Z"/>'+
-'<path class="base" d="M188,80h12v34h-12z"/>';
-const KNEE='<ellipse class="base" cx="159" cy="530" rx="14" ry="12"/>';
-const HEAD='<ellipse class="base" cx="176" cy="58" rx="4" ry="9"/><ellipse class="base" cx="224" cy="58" rx="4" ry="9"/><ellipse class="base" cx="200" cy="52" rx="23" ry="30"/><path class="guide" d="M200,22V82M178,44Q200,38 222,44M177,64Q200,70 223,64"/>';
 
 /* ---------- copy ---------- */
 const INFO={
@@ -251,7 +413,6 @@ Object.assign(INFO,{
 });
 EX.squat[2].push('hipflex','sartorius');EX.dead[2].push('rotator');EX.pull[2].push('rotator');EX.ohp[2].push('rotator');
 document.querySelector('#fig defs').insertAdjacentHTML('beforeend','<radialGradient id="gt" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#f3ede0"/><stop offset=".6" stop-color="#cfc7b5"/><stop offset="1" stop-color="#8f8878"/></radialGradient>');
-const FING='<path class="base" d="M62,440L56,468L62,470L68,444ZM68,444L66,476L72,476L76,440ZM76,438L78,474L84,472L82,434ZM82,430L90,462L96,458L88,424ZM84,400L100,420L96,426L82,412Z"/>';
 FRONT.unshift(['tendon',90,['M183,212L200,212L200,320L183,320Z','M130,372L134,372L142,512L138,512Z','M154,516L166,516L164,546L156,546Z','M150,660L160,660L158,692L152,692Z','M170,660L176,660L176,690L172,690Z','M62,392L82,394L80,410L64,408Z']]);
 FRONT.push(
  ['face',60,['M200,24C190,24 180,30 178,42L200,40Z','M182,48C186,44 194,44 197,48C194,53 186,53 182,48Z','M193,70C196,67 199,68 200,68L200,74C197,76 194,75 193,70Z','M184,60L196,68L194,70L182,62Z','M178,60C177,70 182,78 188,80L190,72Z']],
@@ -402,10 +563,9 @@ function dt(v,m){return Object.keys(DET).filter(k=>k[0]===v).map(k=>{const id=k.
 /* ---------- build ---------- */
 const angles=new Set();
 function half(list,mirror){
-  return list.map(([id,a,ps])=>{angles.add(a);
+  return list.map(([id,shapes])=>{
     const att=mirror&&!DEEPIDS.has(id)?'aria-hidden="true"':`tabindex="0" role="button" aria-label="${INFO[id][0]}"`;
-    return `<g class="m" data-m="${id}" ${att}>`+ps.map(d=>d[d.length-1]==='6'&&false?'':
-      `<path class="mb" d="${d}"/><path class="mf" d="${d}" fill="url(#p${a})"/>`).join('')+'</g>';
+    return `<g class="m" data-m="${id}" ${att}>`+shapes.map(i=>`<path class="mb" data-i="${i}" d="${SHAPES[i].d}"/>`).join('')+'</g>';
   }).join('');
 }
 function view(list,ox,extra){
@@ -413,33 +573,52 @@ function view(list,ox,extra){
   return `<g data-vw="${list===BACK?'b':'f'}" transform="translate(${ox},0)">${HEAD}<text class='sct' data-e='Superficial' x='100' y='12'>Superficial</text><text class='sct' data-e='Deep' x='300' y='12'>Deep</text><g>${h(false)}</g><g transform="translate(400,0) scale(-1,1)">${h(true)}</g>`+
     `<path class="guide" d="M200,112V${list===BACK?404:330}"/></g>`;
 }
-const body=view(FRONT,0,KNEE+FING)+view(BACK,400,FING);
-document.getElementById('views').innerHTML=body;
-/* fibre texture: replace the regular hatch with hand-spun strands that run along each muscle, clipped to its outline */
-(function fibrize(){
- const NS='http://www.w3.org/2000/svg',defs=document.querySelector('#fig defs');let n=0,seed=11;
+FRONT.length=0;FRONT.push(...NF);BACK.length=0;BACK.push(...NB);DEEPF.length=0;DEEPF.push(...NDF);DEEPB.length=0;DEEPB.push(...NDB);
+document.getElementById('views').innerHTML=view(FRONT,0,'')+view(BACK,400,'');
+/* ===== muscle finish: shading, fibre strands and seams, clipped to each outline ===== */
+(function finishMuscles(){
+ const NS='http://www.w3.org/2000/svg',defs=document.querySelector('#fig defs');let seed=7,n=0;
  const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647,P=(x,y)=>x.toFixed(1)+','+y.toFixed(1);
- document.querySelectorAll('#views .m .mf').forEach(mf=>{
-  const mb=mf.previousElementSibling,mt=/p(-?\d+)/.exec(mf.getAttribute('fill')||'');
-  if(!mt){mf.remove();return}
-  const a=+mt[1]*Math.PI/180,bb=mb.getBBox();if(bb.width<1.5||bb.height<1.5){mf.remove();return}
-  const dx=-Math.sin(a),dy=Math.cos(a),nx=Math.cos(a),ny=Math.sin(a);
-  const cs=[[bb.x,bb.y],[bb.x+bb.width,bb.y],[bb.x,bb.y+bb.height],[bb.x+bb.width,bb.y+bb.height]];
-  const ds=cs.map(c=>c[0]*dx+c[1]*dy),ns=cs.map(c=>c[0]*nx+c[1]*ny);
-  const d0=Math.min(...ds),d1=Math.max(...ds),n0=Math.min(...ns),n1=Math.max(...ns),L=d1-d0,nc=(n0+n1)/2;
-  const N=Math.max(5,Math.min(34,Math.round((n1-n0)/1.5))),S={d:'',l:'',b:''};
-  const xy=(u,v)=>P(dx*u+nx*v,dy*u+ny*v);
-  for(let i=0;i<N;i++){
-   const t=n0+(i+.5)/N*(n1-n0)+(rnd()-.5)*.7,w=(rnd()-.5)*2.4,ds_=d0+rnd()*.07*L,de=d1-rnd()*.07*L;
-   const ts=nc+(t-nc)*(.72+.28*rnd()),te=nc+(t-nc)*(.72+.28*rnd());            // strands pinch toward the tendon ends
-   const seg='M'+xy(ds_,ts)+'C'+xy(ds_+.33*(de-ds_),t+w)+' '+xy(ds_+.66*(de-ds_),t-w)+' '+xy(de,te);
-   if(i%7===3)S.b+=seg;else if(i%2)S.l+=seg;else S.d+=seg}
-  const id='fc'+(n++),cp=document.createElementNS(NS,'clipPath');cp.id=id;
-  const cpp=document.createElementNS(NS,'path');cpp.setAttribute('d',mb.getAttribute('d'));cp.appendChild(cpp);defs.appendChild(cp);
-  const g=document.createElementNS(NS,'g');g.setAttribute('class','fg');g.setAttribute('clip-path','url(#'+id+')');
-  for(const k of ['d','l','b']){if(!S[k])continue;const p=document.createElementNS(NS,'path');p.setAttribute('class','fs '+k);p.setAttribute('d',S[k]);g.appendChild(p)}
-  mf.replaceWith(g)});
+ const mk=(tag,at)=>{const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);return e};
+ document.querySelectorAll('#views .m').forEach(g=>{
+  const isTendon=g.dataset.m==='tendon';
+  g.querySelectorAll('.mb[data-i]').forEach(mb=>{
+   const m=SHAPES[+mb.dataset.i];if(!m)return;
+   const id='mc'+(n++),ol=m.ol;let cx=0,cy=0;ol.forEach(p=>{cx+=p[0];cy+=p[1]});cx/=ol.length;cy/=ol.length;
+   // long axis direction
+   let ang;if(m.t==='b'){const a=m.P[0],z=m.P[m.P.length-1];ang=Math.atan2(z[1]-a[1],z[0]-a[0])}
+   else if(m.dir!=null)ang=m.dir*Math.PI/180;
+   else{let sxx=0,syy=0,sxy=0;ol.forEach(p=>{const x=p[0]-cx,y=p[1]-cy;sxx+=x*x;syy+=y*y;sxy+=x*y});ang=.5*Math.atan2(2*sxy,sxx-syy)}
+   const dx=Math.cos(ang),dy=Math.sin(ang),nx=-dy,ny=dx;
+   let lo=1e9,hi=-1e9,l0=1e9,l1=-1e9;ol.forEach(p=>{const t=(p[0]-cx)*nx+(p[1]-cy)*ny,u=(p[0]-cx)*dx+(p[1]-cy)*dy;lo=Math.min(lo,t);hi=Math.max(hi,t);l0=Math.min(l0,u);l1=Math.max(l1,u)});
+   const gr=mk('linearGradient',{id:'sh'+id,gradientUnits:'userSpaceOnUse',x1:cx+nx*lo,y1:cy+ny*lo,x2:cx+nx*hi,y2:cy+ny*hi});
+   gr.innerHTML=isTendon||m.tn?'<stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".4"/>':
+    '<stop offset="0" stop-color="#000" stop-opacity=".42"/><stop offset=".2" stop-color="#fff" stop-opacity=".2"/><stop offset=".42" stop-color="#fff" stop-opacity=".07"/><stop offset=".78" stop-color="#000" stop-opacity=".22"/><stop offset="1" stop-color="#000" stop-opacity=".62"/>';
+   defs.appendChild(gr);
+   const sh=mk('path',{class:'sh',d:m.d,fill:'url(#sh'+id+')'});mb.after(sh);
+   if(isTendon||m.tn)return;
+   const cp=mk('clipPath',{id:'cl'+id});cp.appendChild(mk('path',{d:m.d}));defs.appendChild(cp);
+   const S={d:'',l:'',b:''};const cls=i=>i%7===3?'b':i%2?'l':'d';
+   const wid=hi-lo,N=Math.max(4,Math.min(30,Math.round(wid/1.7)));
+   if(m.t==='b'){const Sp=spine(m.P,m.W,8);
+    for(let i=0;i<N;i++){const s=((i+.5)/N)*2-1+(rnd()-.5)*.1,a=Math.floor(rnd()*3),b=Sp.length-1-Math.floor(rnd()*3);
+     let d='';for(let k=a;k<=b;k++){const q=Sp[k];d+=(k===a?'M':'L')+P(q.x+q.nx*q.w*s*.98,q.y+q.ny*q.w*s*.98)}S[cls(i)]+=d}
+    if(m.seam){let d='';Sp.forEach((q,k)=>{d+=(k?'L':'M')+P(q.x+q.nx*q.w*.12,q.y+q.ny*q.w*.12)});S.b+=d}}
+   else if(m.fan){const [O,I]=m.fan,M=Math.max(6,Math.min(26,Math.round(Math.hypot(O[2]-O[0],O[3]-O[1])/1.8)));
+    for(let i=0;i<M;i++){const s=(i+.5)/M,A=[O[0]+(O[2]-O[0])*s,O[1]+(O[3]-O[1])*s],B=[I[0]+(I[2]-I[0])*s,I[1]+(I[3]-I[1])*s],bow=(rnd()-.5)*4,
+      mx=(A[0]+B[0])/2-(B[1]-A[1])*.0+bow,my=(A[1]+B[1])/2+bow;
+     S[cls(i)]+='M'+P(A[0],A[1])+'Q'+P(mx,my)+' '+P(B[0],B[1])}}
+   else{const L=l1-l0+10;
+    for(let i=0;i<N;i++){const t=lo+(i+.5)/N*(hi-lo),w=(rnd()-.5)*2.2,u0=l0-3,u1=l1+3,
+      X=(u,v)=>P(cx+dx*u+nx*v,cy+dy*u+ny*v);
+     S[cls(i)]+='M'+X(u0,t)+'C'+X(u0+.33*(u1-u0),t+w)+' '+X(u0+.66*(u1-u0),t-w)+' '+X(u1,t)}}
+   if(m.seam&&m.t==='f'&&m.fan){const a=m.fan[0];S.b+='M'+P(a[0]+(a[2]-a[0])*.5,a[1]+(a[3]-a[1])*.5)+'L'+P(m.fan[1][0]+(m.fan[1][2]-m.fan[1][0])*.5,m.fan[1][1]+(m.fan[1][3]-m.fan[1][1])*.5)}
+   const fg=mk('g',{class:'fg','clip-path':'url(#cl'+id+')'});
+   for(const k of ['d','l','b'])if(S[k])fg.appendChild(mk('path',{class:'fs '+k,d:S[k]}));
+   sh.after(fg)});
+ });
 })();
+
 const defs=document.querySelector('#fig defs');
 angles.forEach(a=>defs.insertAdjacentHTML('beforeend',
  `<pattern id="p${a}" width="3.4" height="3.4" patternUnits="userSpaceOnUse" patternTransform="rotate(${a})"><line x1="0" y1="0" x2="0" y2="3.4" stroke="#000" stroke-opacity=".32" stroke-width="1"/></pattern>`));
@@ -565,12 +744,12 @@ const bone=(id,ps,m)=>`<g class='m bn' data-m='${id}' ${m?`aria-hidden='true'`:`
 const bl=(L,m)=>L.map(([id,ps])=>bone(id,ps,m)).join('');
 document.getElementById('skel').innerHTML=`<g data-vw='s'><g>${bl(SKL,false)}</g><g transform='translate(400,0) scale(-1,1)'>${bl(SKL,true)}</g><g>${bl(SKC,false)}<circle class='sock' cx='191' cy='52' r='5.5'/><circle class='sock' cx='209' cy='52' r='5.5'/><path class='sock' d='M200,58L197,66L203,66Z'/></g></g>`;
 /* ---------- realistic skeleton (overrides the first draft) ---------- */
-document.querySelector('#fig defs').insertAdjacentHTML('beforeend',`<linearGradient id='gb' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='#8a7c5c'/><stop offset='.28' stop-color='#e6d9b8'/><stop offset='.5' stop-color='#f4ebd2'/><stop offset='.78' stop-color='#cfc09c'/><stop offset='1' stop-color='#857758'/></linearGradient>`);
+document.querySelector('#fig defs').insertAdjacentHTML('beforeend',`<filter id='bonelit' x='-6%' y='-6%' width='112%' height='112%' color-interpolation-filters='sRGB'><feGaussianBlur in='SourceAlpha' stdDeviation='1.5' result='b'/><feSpecularLighting in='b' surfaceScale='3.5' specularConstant='.75' specularExponent='16' lighting-color='#fff3d6' result='sp'><feDistantLight azimuth='235' elevation='52'/></feSpecularLighting><feComposite in='sp' in2='SourceAlpha' operator='in' result='sp2'/><feComposite in='SourceGraphic' in2='sp2' operator='arithmetic' k1='0' k2='1' k3='.6' k4='0'/></filter><linearGradient id='gb' x1='0' y1='0' x2='1' y2='0'><stop offset='0' stop-color='#8a7c5c'/><stop offset='.28' stop-color='#e6d9b8'/><stop offset='.5' stop-color='#f4ebd2'/><stop offset='.78' stop-color='#cfc09c'/><stop offset='1' stop-color='#857758'/></linearGradient>`);
 const cr=(P,n=7)=>{const o=[];for(let i=0;i<P.length-1;i++){const p0=P[i-1]||P[i],p1=P[i],p2=P[i+1],p3=P[i+2]||P[i+1];for(let t=0;t<n;t++){const s=t/n,s2=s*s,s3=s2*s;o.push([0,1].map(k=>.5*(2*p1[k]+(-p0[k]+p2[k])*s+(2*p0[k]-5*p1[k]+4*p2[k]-p3[k])*s2+(-p0[k]+3*p1[k]-3*p2[k]+p3[k])*s3)))}}o.push(P[P.length-1]);return o};
 const band=(P,w0,w1,wm)=>{const Q=cr(P),N=Q.length,L=[],R=[];Q.forEach((p,i)=>{const a=Q[Math.max(0,i-1)],b=Q[Math.min(N-1,i+1)];let dx=b[0]-a[0],dy=b[1]-a[1];const l=Math.hypot(dx,dy)||1;dx/=l;dy/=l;const u=i/(N-1),w=(w0+(w1-w0)*u)*(1+(wm||0)*Math.sin(Math.PI*u))/2;L.push([p[0]-dy*w,p[1]+dx*w]);R.push([p[0]+dy*w,p[1]-dx*w])});const f=a=>a.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join('L');return 'M'+f(L)+'L'+f(R.reverse())+'Z'};
 const el=(x,y,rx,ry)=>`M${x-rx},${y}a${rx},${ry} 0 1,0 ${2*rx},0a${rx},${ry} 0 1,0 ${-2*rx},0Z`;
 const rrect=(x,y,w,h,r)=>`M${x+r},${y}h${w-2*r}q${r},0 ${r},${r}v${h-2*r}q0,${r} ${-r},${r}h${-(w-2*r)}q${-r},0 ${-r},${-r}v${-(h-2*r)}q0,${-r} ${r},${-r}z`;
-const fing=(x,y,deg,segs,ws)=>{const a=deg*Math.PI/180,ux=Math.sin(a),uy=Math.cos(a),nx=uy,ny=-ux;let px=x,py=y;return segs.map((l,i)=>{const w=ws[i]*1.35,q=(t,s)=>[(px+ux*l*t+nx*w*s).toFixed(1),(py+uy*l*t+ny*w*s).toFixed(1)].join(',');const d=`M${q(0,.62)}L${q(.18,.4)}L${q(.82,.4)}L${q(1,.62)}L${q(1,-.62)}L${q(.82,-.4)}L${q(.18,-.4)}L${q(0,-.62)}Z`;px+=ux*(l+1.2);py+=uy*(l+1.2);return d})};
+const fing=(x,y,deg,segs,ws)=>{const a=deg*Math.PI/180,ux=Math.sin(a),uy=Math.cos(a),nx=uy,ny=-ux;let px=x,py=y;return segs.map((l,i)=>{const w=ws[i]*1.35,q=(t,s)=>[(px+ux*l*t+nx*w*s).toFixed(1),(py+uy*l*t+ny*w*s).toFixed(1)].join(',');const d=`M${q(.02,.8)}C${q(.12,.55)} ${q(.25,.45)} ${q(.5,.45)}C${q(.75,.45)} ${q(.88,.55)} ${q(.98,.8)}Q${q(1.08,0)} ${q(.98,-.8)}C${q(.88,-.55)} ${q(.75,-.45)} ${q(.5,-.45)}C${q(.25,-.45)} ${q(.12,-.55)} ${q(.02,-.8)}Q${q(-.08,0)} ${q(.02,.8)}Z`;px+=ux*(l+1.2);py+=uy*(l+1.2);return d})};
 const RIB=[],XL=[36,46,53,58,61,62,61,58,54,48,40,32];
 for(let i=0;i<12;i++){const yp=127+i*12.2,xl=200-XL[i];let P;
  if(i<7){const ys=128+i*10,xa=200-[16,22,26,30,33,35,37][i],ya=ys+8+(i?0:4);P=i?[[193,yp],[xl+14,yp+1],[xl,yp+14+i],[xl+8,yp+28+i*1.4],[xa,ya]]:[[193,yp+1],[xl+16,yp-2],[xl,yp+8],[xa+4,ya]];RIB.push(band(P,4.2,2.6,.1),'c:'+band([[xa,ya],[(xa+196)/2,ys+3],[195,ys]],3,3))}
@@ -580,7 +759,7 @@ const VT=['v:M193,88h14v260h-14z'];
 for(let i=0;i<24;i++){let y,w,h,tp;if(i<7){y=90+i*6.4;w=8+i*.7;h=5;tp=4}else if(i<19){y=136+(i-7)*13;w=12+(i-7)*.5;h=10;tp=5}else{y=294+(i-19)*10.5;w=18;h=9;tp=9}
  VT.push(rrect(200-w/2,y,w,h,1.6),`M${200-w/2},${y+h*.3}l${-tp},-1v2.4l${tp},1z`,`M${200+w/2},${y+h*.3}l${tp},-1v2.4l${-tp},1z`)}
 const K=[[74,398],[80,396],[86,397],[91,400],[72,405],[78,404],[84,403],[90,406]].map(p=>el(p[0],p[1],3.8,3.3));
-const HAND=[...K,...fing(73,408,-30,[26,14,9,8],[3.2,3,2.6,2.3]),...fing(79,409,-20,[27,15,10,8],[3.2,3,2.6,2.3]),...fing(85,409,-10,[25,14,9,8],[3.2,3,2.6,2.3]),...fing(91,407,0,[22,10,7,7],[3,2.8,2.4,2.2]),...fing(67,402,-52,[18,12,9],[3.6,3.2,2.8])];
+const HAND=[...K,...fing(73,408,-15,[26,14,9,8],[3.8,3.4,3,2.6]),...fing(79,409,-8,[27,15,10,8],[3.8,3.4,3,2.6]),...fing(85,409,-2,[25,14,9,8],[3.8,3.4,3,2.6]),...fing(91,407,5,[22,10,7,7],[3.4,3.1,2.7,2.4]),...fing(67,402,-40,[18,12,9],[4,3.5,3])];
 const FOOT=['M149,700C152,696 166,696 169,700L170,708L148,708Z','M146,708L172,708L176,716L142,716Z','d:M152,708L152,716M158,708L158,716M165,708L166,716',...[[148,143],[153,151],[158,159],[163,167],[169,176]].map(([b,e])=>`M${b-1.4},716L${b+1.4},716L${e+1.2},727L${e-1.2},727Z`)];
 const SK2L=[
 ['scapula',['M139,124L129,128C125,142 126,168 131,190L140,184C144,170 146,152 146,136C144,132 141,128 139,124Z','M146,128L150,123L154,128Z','d:M131,186C127,160 128,142 131,132']],
@@ -620,7 +799,7 @@ const SK3L=[
  ['scapula',['M180,130L184,150L180,176L168,206C158,204 148,192 142,170C138,160 138,152 140,146L130,126C136,122 148,130 160,138C168,136 174,132 180,130Z','d:M184,148L134,128','h:M178,140L170,200']],
  pick('humerus'),pick('radius'),pick('ulna'),pick('hand'),
  ['pelvis',nod(hipB[1]).concat(['d:M142,346C152,356 164,364 176,368','d:M148,338C160,350 172,358 184,362','k:M150,388C146,394 148,402 154,406','h:M190,334C172,328 152,329 138,336']),hipB[2]],
- ['femur',nod(fB[1]).concat(['d:M152,428C153,460 156,490 158,508','d:M155,518L155,530','h:M147,432C147,462 150,490 152,508'])],
+ ['femur',nod(fB[1]).concat(['d:M152,428C153,460 156,490 158,508','d:M155,518L155,530','h:M147,432C147,462 150,490 152,508','M141,516C138,528 144,538 153,538C158,538 160,532 160,520Z','M160,520C160,532 164,540 171,538C177,534 175,526 173,516Z'])],
  pick('tibia'),pick('fibula'),
  ['foot',['M146,690C146,704 150,722 158,727C166,727 172,718 172,704L168,690Z','d:M156,696C157,706 158,716 158,724','h:M150,700C150,710 152,718 155,724']]];
 const SK3C=[
@@ -668,10 +847,10 @@ function dt(v,m){return Object.keys(DET).filter(k=>k[0]===v).map(k=>{const id=k.
  else{if(!dp)s=d.l.map(p=>`<path d='${p}'/>`).join('');
   s+=d.t.map(([t,px,py,ly,lx])=>dp?`<path class='ld' d='M${396-t.length*3.3-3},${ly-2}L${400-px},${py}'/><circle cx='${400-px}' cy='${py}' r='1.3' fill='#fff'/><text x='396' y='${ly}' text-anchor='end' data-r='1' data-e='${t}' data-px='${px}' data-py='${py}' data-ly='${ly}'>${t}</text>`:`<path class='ld' d='M${(lx||4)+t.length*3.3+3},${ly-2}L${px},${py}'/><circle cx='${px}' cy='${py}' r='1.3' fill='#fff'/><text x='${lx||4}' y='${ly}' data-x='${lx||4}' data-e='${t}' data-px='${px}' data-py='${py}' data-ly='${ly}'>${t}</text>`).join('')}
  return `<g class='dt' data-d='${id}'>${s}</g>`}).join('')}
-const F4=[fing(73,408,-30,[26,14,9,8],[3.2,3,2.6,2.3]),fing(79,409,-20,[27,15,10,8],[3.2,3,2.6,2.3]),fing(85,409,-10,[25,14,9,8],[3.2,3,2.6,2.3]),fing(91,407,0,[22,10,7,7],[3,2.8,2.4,2.2]),fing(67,402,-52,[18,12,9],[3.6,3.2,2.8])];
+const F4=[fing(73,408,-15,[26,14,9,8],[3.8,3.4,3,2.6]),fing(79,409,-8,[27,15,10,8],[3.8,3.4,3,2.6]),fing(85,409,-2,[25,14,9,8],[3.8,3.4,3,2.6]),fing(91,407,5,[22,10,7,7],[3.4,3.1,2.7,2.4]),fing(67,402,-40,[18,12,9],[4,3.5,3])];
 const fb=[148,153,158,163,169],fe=[143,151,159,167,176];
-const MT=fb.map((b,i)=>{const m=b+(fe[i]-b)*.45;return `M${b-1.6},708L${b+1.6},708L${m+1.4},718L${m-1.4},718Z`});
-const TP=fb.map((b,i)=>{const m=b+(fe[i]-b)*.45,e=fe[i];return `M${m-1.2},719L${m+1.2},719L${e+1},727L${e-1},727Z`});
+const TOES=[fing(150,706,-7,[12,7,5],[2.9,2.6,2.2]),fing(155.5,706,-4,[13,7,5],[2.9,2.6,2.2]),fing(161,706,-1,[13,8,5],[3,2.7,2.3]),fing(166.5,706,2,[14,8,5],[3.1,2.8,2.4]),fing(172,705,4,[15,11],[4.6,4.1])];const MT=TOES.map(t=>t[0]);
+const TP=TOES.flatMap(t=>t.slice(1));
 const ILI=['M196,338C182,326 158,326 140,334C131,339 127,348 129,357C131,366 137,373 146,378C150,384 156,388 160,388L170,386C178,380 186,376 188,372L190,356Z','d:M143,398a10,10 0 1,0 20,0a10,10 0 1,0 -20,0Z','d:M146,380C160,372 176,372 188,380','h:M190,334C172,328 152,329 138,336'];
 const ISC=['M142,396C142,408 150,418 160,421C163,432 168,441 176,447C183,450 189,444 190,438L188,426L176,414L160,404Z'];
 const PUB=['M176,414L188,426L190,438L194,428L200,420L200,414L196,408C190,398 186,390 182,392Z','k:M168,426C165,433 167,441 172,443C177,443 179,437 177,430Z'];
@@ -756,6 +935,66 @@ document.querySelectorAll('#views [data-vw]').forEach(g=>{const back=g.dataset.v
  g.insertAdjacentHTML('beforeend',`<g>${JD.filter(j=>j.p&&ok(j)).map(j=>jm(j,j.x,false)).join('')}</g><g transform='translate(400,0) scale(-1,1)'>${JD.filter(j=>j.p&&ok(j)).map(j=>jm(j,j.x,true)).join('')}</g><g>${JD.filter(j=>!j.p&&ok(j)).map(j=>jm(j,j.x,false)).join('')}</g>`)});
 const HIPB=`<g class='bn' style='pointer-events:none' transform='${TF}'><path class='mb' d='${hipB[1][0]}'/></g>`;
 document.getElementById('skel').innerHTML=`<g data-vw='s'><g>${HIPB}${bl2(SK4L,false)}</g><g transform='translate(400,0) scale(-1,1)'>${HIPB}${bl2(SK4L,true)}</g><g>${BASEF}${bl2(SK4C,false)}${SOCKF}${dt('s',false)}</g><g>${jl(false)}</g><g transform='translate(400,0) scale(-1,1)'>${jl(true)}</g><g>${jc()}</g></g><g data-vw='sb' transform='translate(400,0)'><g>${HIPB}${bl2(SK4BL,false)}</g><g transform='translate(400,0) scale(-1,1)'>${HIPB}${bl2(SK4BL,true)}</g><g>${BASEB}${bl2(SK4BC,false)}${dt('s',false)}</g><g>${jl(false)}</g><g transform='translate(400,0) scale(-1,1)'>${jl(true)}</g><g>${jc()}</g></g>`;
+/* ---------- realistic bone redraw (final pass over the skeleton markup) ---------- */
+function realBones(){
+ const f=v=>Math.round(v*10)/10;
+ const mirD=d=>d.replace(/([MCLZ])([^MCLZ]*)/g,(m,c,r)=>{if(c==='Z')return 'Z';const n=r.trim().split(/[ ,]+/).map(Number);let o=[];for(let i=0;i<n.length;i+=2)o.push(f(400-n[i])+','+n[i+1]);return c+o.join(' ')});
+ /* symmetric shape from a right-half description (start on the midline, end on the midline) */
+ const sym=(P0,segs)=>{const S=[P0];let d='M'+P0.join(',');segs.forEach(s=>{if(s.length===2){d+='L'+s.join(',');S.push(s)}else{d+='C'+s.slice(0,2).join(',')+' '+s.slice(2,4).join(',')+' '+s.slice(4).join(',');S.push(s.slice(4))}});
+  const mx=p=>[400-p[0],p[1]];
+  for(let i=segs.length-1;i>=0;i--){const s=segs[i];if(s.length===2)d+='L'+mx(S[i]).join(',');else d+='C'+mx(s.slice(2,4)).join(',')+' '+mx(s.slice(0,2)).join(',')+' '+mx(S[i]).join(',')}
+  return d+'Z'};
+ const both=d=>[d,mirD(d)];
+ const PCL={k:'sock',d:'dl',h:'hl',t:'tooth',c:'mb cart',v:'disc'};
+ const pth=d=>{const m=/^([a-z]):/.exec(d);return m?`<path class='${PCL[m[1]]}' d='${d.slice(2)}'/>`:`<path class='mb' d='${d}'/>`};
+ const set=(view,id,ps)=>document.querySelectorAll(`#skel [data-vw=${view}] g.bn[data-m=${id}]`).forEach(g=>{g.innerHTML=ps.map(pth).join('')});
+ const setBase=(view,ps)=>{const g=document.querySelector(`#skel [data-vw=${view}] > g:nth-child(3) > g.bn`);if(g)g.innerHTML=ps.map(pth).join('')};
+ /* ---- long bones (left half frame) ---- */
+ const FEM=['M156,388C162,388 167,393 167,399C167,404 163,408 160,411C159,414 159,419 159,425C160,452 163,482 164,500C165,508 170,512 172,520C173,528 168,534 161,534C158,534 157,531 156,529C155,531 152,534 147,534C140,533 138,526 140,518C142,512 145,508 145,500C145,480 143,450 142,431C139,430 135,427 133,421C131,415 133,408 139,406C142,405 144,403 146,400C147,393 151,388 156,388Z',
+  'd:M139,410C141,416 141,424 140,429','d:M156,522L156,533','d:M148,402C152,407 157,409 160,410','h:M151,432C150,462 153,490 155,508','h:M152,392C154,390 159,391 161,394'];
+ const FEMB=['M156,388C162,388 167,393 167,399C167,404 163,408 160,411C159,414 159,419 159,425C160,452 163,482 164,500C165,508 170,512 172,520C173,528 168,534 161,534C158,534 157,531 156,529C155,531 152,534 147,534C140,533 138,526 140,518C142,512 145,508 145,500C145,480 143,450 142,431C139,430 135,427 133,421C131,415 133,408 139,406C142,405 144,403 146,400C147,393 151,388 156,388Z',
+  'd:M154,432C155,462 157,490 157,508','d:M150,512C150,520 152,527 156,530','d:M162,512C163,520 161,527 158,530','h:M150,432C150,462 153,490 154,508'];
+ const TIB=['M146,538C146,534 151,532 157,533L168,533C175,532 181,535 180,541C180,546 176,550 173,553C172,558 171,566 170,580C169,610 168,650 168,676C168,684 170,690 172,696C173,702 171,706 166,706L156,706C152,706 151,703 152,699C153,692 153,684 152,676C151,650 150,610 150,580C150,568 150,558 149,552C146,549 145,544 146,538Z',
+  'd:M156,552C158,556 158,560 160,565','d:M170,690C171,696 170,700 168,703','d:M163,534L163,541','h:M160,568C160,600 161,650 162,692'];
+ const FIB=['M137,550C137,545 142,543 147,545C149,547 148,552 148,556C148,590 149,640 151,684C152,692 153,698 152,704C151,708 146,709 142,707C139,703 140,696 141,690C141,650 141,600 140,566C138,562 137,556 137,550Z','h:M144,570C144,610 145,650 146,686'];
+ const HUM=['M122,127C131,126 139,132 140,141C140,148 137,153 133,157C132,163 131,168 130,174C128,205 124,250 122,280C124,283 127,287 127,293C128,298 125,302 119,303C113,304 105,303 101,299C99,294 101,288 105,283C108,250 112,205 117,175C117,168 116,162 114,158C110,154 108,149 108,142C108,134 114,127 122,127Z',
+  'd:M115,151C118,156 118,162 117,168','d:M113,290L113,302','d:M110,140C112,134 118,131 123,131','h:M123,172C121,210 117,250 114,280','h:M126,131C131,132 135,136 136,141'];
+ const HUMB=[HUM[0],'d:M126,176C124,210 120,250 118,278','d:M110,296C112,291 118,290 122,292','h:M121,172C119,210 115,250 112,280'];
+ const RAD=['M99,301C103,297 111,297 113,302C113,306 110,309 108,312C106,320 100,340 92,358C88,368 84,378 81,386C84,390 86,394 82,397C77,399 70,397 69,392C69,388 71,384 73,382C78,372 83,358 89,346C94,334 98,322 98,312C96,308 97,304 99,301Z','d:M76,392C78,394 80,395 82,394','h:M104,314C98,334 90,358 82,380'];
+ const ULN=['M113,294C118,291 125,293 126,299C126,305 123,310 121,314C116,330 106,358 96,380C93,388 92,394 88,397C84,398 82,394 84,390C86,384 88,376 91,368C98,350 106,330 109,316C109,310 108,306 110,300C110,297 111,295 113,294Z','d:M114,300C117,300 120,302 121,306','h:M117,312C112,332 103,356 94,380'];
+ const CLAV=['M195,118C199,119 200,125 196,127C190,128 184,124 177,121C168,118 159,122 151,127C147,129 142,128 139,126C137,123 140,120 145,120C154,118 163,113 172,114C180,115 187,121 195,118Z','h:M184,119C172,115 160,119 148,124'];
+ const SCAP=['M182,128C176,130 168,132 160,134C152,133 144,130 138,126C134,122 129,124 128,128C128,132 133,134 138,137C139,143 139,150 141,156C146,170 154,190 163,208C166,212 170,210 171,206C175,190 180,165 184,148C185,140 184,133 182,128Z','d:M184,148C170,142 150,136 132,128','d:M141,156C146,150 150,152 152,158','h:M176,160C173,178 168,196 166,206'];
+ set('s','scapula',['M146,127C140,124 132,124 128,128C127,134 129,142 130,152C131,166 133,178 136,190C139,194 144,192 145,186C147,172 147,150 146,127Z','d:M130,150C134,160 140,162 146,160','h:M141,134C140,150 141,170 142,184']);
+ set('s','femur',FEM);set('sb','femur',FEMB);set('s','tibia',TIB);set('sb','tibia',TIB);set('s','fibula',FIB);set('sb','fibula',FIB);
+ set('s','humerus',HUM);set('sb','humerus',HUMB);set('s','radius',RAD);set('sb','radius',RAD);set('s','ulna',ULN);set('sb','ulna',ULN);
+ set('s','clavicle',CLAV);set('sb','clavicle',CLAV);set('sb','scapula',SCAP);
+ /* ---- skull and jaw (centre line shapes) ---- */
+ const SKF=sym([200,16.5],[[217,16.5,229,27,229,45],[229,53,227,58,225,62],[227,64,230,67,229,71],[228,75,224,76,222,77],[221,84,219,88,216,91],[213,94,208,95,205,95],[200,95]]);
+ const SKB=sym([200,16.5],[[217,16.5,229,27,229,46],[229,58,226,66,221,73],[218,79,213,83,208,86],[205,88,202,88,200,88]]);
+ const ORB=d=>[d,mirD(d)];
+ const orbR='M205,58C205,54 209,52 213,52C217,52 219,55 219,58C219,62 215,65 211,65C207,64 205,62 205,58Z';
+ const NAS='M200,63C202,65 204,70 204,75C203,77 201,76 200,77Z';
+ const TEETH=(y0)=>{let a=[];for(let i=-3;i<=3;i++){a.push('d:M'+(200+i*2.8)+','+y0+'L'+(200+i*2.8)+','+(y0+5))}return a};
+ setBase('s',[SKF,'d:M203,51C208,48 215,48 220,51','d:M197,51C192,48 185,48 180,51']);
+ const sockG=document.querySelector('#skel [data-vw=s] > g:nth-child(3)');
+ if(sockG){sockG.querySelectorAll(':scope > path.sock').forEach(p=>p.remove());
+  const h=document.createElementNS('http://www.w3.org/2000/svg','g');h.innerHTML=[orbR,mirD(orbR),NAS,mirD(NAS)].map(d=>`<path class='sock' d='${d}'/>`).join('');
+  sockG.querySelectorAll('g.bn[data-m=maxilla]').forEach(m=>m.after(h));}
+ set('s','parietal',[sym([200,16.5],[[217,16.5,229,27,229,44],[225,36,213,30,200,30]]),'d:M200,17L200,30']);
+ set('s','frontal',[sym([200,30],[[213,30,225,36,229,44],[229,48,226,51,222,52],[216,51,208,50,203,50],[202,51,201,52,200,53]]),'h:M188,31C194,28 206,28 212,31']);
+ set('s','temporal',[...both('M221,40C225,42 228,46 229,50C229,55 227,59 225,62C222,62 220,60 219,56C218,50 219,44 221,40Z'),'d:M225,52C226,56 226,60 225,62']);
+ set('s','zygomatic',[...both('M216,63C220,61 225,63 228,66C230,70 227,74 223,76C220,75 217,71 216,67C215,65 215,64 216,63Z')]);
+ set('s','nasal',['M197,50C199,48 201,48 203,50L204,60L196,60Z','d:M200,49L200,60']);
+ set('s','maxilla',[sym([200,63],[[207,63,212,66,213,72],[214,80,213,87,211,91],[209,94,205,95,200,95]]),...TEETH(88),'t:M191,88C196,90 204,90 209,88L209,94C204,96 196,96 191,94Z']);
+ set('s','mandible',[sym([200,109],[[210,109,217,104,220,97],[221,91,222,84,222,78],[222,76,220,76,218,77],[216,84,214,89,211,92],[208,94,204,94,200,94]]),'t:M191,96C196,98 204,98 209,96L208,100C204,101 196,101 192,100Z','d:M196,104C199,106 201,106 204,104','h:M214,92C216,88 217,84 218,80']);
+ setBase('sb',[SKB,'d:M200,17L200,88']);
+ set('sb','parietal',[sym([200,16.5],[[217,16.5,229,27,229,50],[229,53,228,57,226,62],[218,58,208,56,200,56]]),'d:M200,17L200,56','h:M186,24C192,19 208,19 214,24']);
+ set('sb','occipital',[sym([200,56],[[208,56,218,58,226,62],[226,68,222,76,217,81],[213,85,207,88,200,88]]),'d:M200,60L200,88','d:M194,74C197,70 203,70 206,74']);
+ set('sb','temporal',[...both('M226,64C230,66 231,72 228,77C226,80 222,80 220,76C220,71 222,67 226,64Z')]);
+ ['frontal','parietal','occipital','temporal','maxilla','zygomatic'].forEach(id=>document.querySelectorAll(`#skel g.bn[data-m=${id}] .mb`).forEach(p=>{p.style.strokeOpacity='.4'}));
+}
+
+realBones();
 document.getElementById('sk').onclick=()=>{skel=!skel;cancelAnimationFrame(raf);sel=null;
  document.getElementById('views').style.display=skel?'none':'';document.getElementById('skel').style.display=skel?'':'none';
  document.querySelector('.legend').style.display=skel?'none':'';
@@ -771,21 +1010,41 @@ const skillQuery=document.getElementById('skillQuery'),skillResults=document.get
 const norm=s=>s.toLowerCase().normalize('NFKD').replace(/[\u064B-\u065F\u0670]/g,'').replace(/[أإآ]/g,'ا').replace(/[^a-z0-9\u0600-\u06ff]+/g,' ').trim();
 const ui=(en,ar)=>lang==='ar'?ar:en;
 function updateSkillLabels(){
- document.getElementById('skillLabel').textContent=ui('Search sports skills','ابحث عن مهارة رياضية');
+ document.getElementById('skillLabel').textContent=ui('Search sports skills','ابحث عن مهارة رياضية');document.getElementById('menuLabel').textContent=ui('Sports','الرياضات');document.getElementById('sideTitle').textContent=ui('Sports and search','الرياضات والبحث');document.getElementById('sideClose').setAttribute('aria-label',ui('Close','إغلاق'));document.getElementById('menu').setAttribute('aria-label',ui('Sports and search','الرياضات والبحث'));sideEl.dir=lang==='ar'?'rtl':'ltr';document.getElementById('card').parentElement.classList.toggle('is-ar',lang==='ar');
  document.getElementById('clearSkill').textContent=ui('Clear','مسح');
  skillQuery.placeholder=ui('Try jab, serve, long jump...','جرب التصويب بالقفز أو الإرسال أو الوثب الطويل');
  renderResults(false);
 }
 function matching(){const q=norm(skillQuery.value);return SKILLS.filter(s=>!q||q.split(' ').every(w=>norm(s.name+' '+s.ar+' '+s.sport+' '+SPA(s.sport)+' '+s.aliases).includes(w)))}
+const openSports=new Set();
 function renderResults(auto=true){
- const q=norm(skillQuery.value),matches=matching();
- if(auto){const exact=matches.find(s=>norm(s.name)===q||norm(s.ar)===q);if(q&&(exact||matches.length===1)){selectSkill((exact||matches[0]).id,false)}else if(selectedSkill){selectedSkill=null;sel=null;fig.classList.remove('skill-mode');paint()}}
- skillResults.replaceChildren();
- if(!q){[...new Set(SKILLS.map(s=>s.sport))].forEach(sp=>{const b=document.createElement('button');b.type='button';b.className='sport-chip';b.textContent=ui(sp,SPA(sp))+' · '+SKILLS.filter(s=>s.sport===sp).length;b.onclick=()=>{skillQuery.value=sp==='Soccer (football)'?'soccer':sp;renderResults()};skillResults.append(b)})}
- const shown=q?matches:[];
- shown.forEach(s=>{const b=document.createElement('button');b.type='button';b.textContent=(lang==='ar'?s.ar:s.name)+' · '+ui(s.sport,SPA(s.sport));b.setAttribute('aria-pressed',selectedSkill?.id===s.id);b.onclick=()=>selectSkill(s.id);skillResults.append(b)});
- skillStatus.textContent=!q?ui(SKILLS.length+' skills in 9 sports in this offline library. Type a skill or sport, or choose a sport.',SKILLS.length+' مهارة في 9 رياضات. اكتب اسم مهارة أو رياضة، أو اختر رياضة.') : matches.length?ui(matches.length+' matching skill'+(matches.length===1?'':'s')+'. Choose a result; Enter opens the first.',matches.length+' نتيجة. اختر مهارة؛ مفتاح الإدخال يفتح الأولى.'):ui('No matching skill in this library. Try a shorter name or another skill.','لا توجد مهارة مطابقة في هذه المكتبة. جرب اسما أقصر.');
+  const q=norm(skillQuery.value),matches=matching();
+  if(auto){const exact=matches.find(s=>norm(s.name)===q||norm(s.ar)===q);if(q&&(exact||matches.length===1)){selectSkill((exact||matches[0]).id,false)}else if(selectedSkill){selectedSkill=null;sel=null;fig.classList.remove('skill-mode');paint()}}
+  skillResults.replaceChildren();
+  const sports=[...new Set(SKILLS.map(s=>s.sport))];
+  sports.forEach(sp=>{
+    const list=(q?matches:SKILLS).filter(s=>s.sport===sp);if(!list.length)return;
+    const isOpen=!!q||openSports.has(sp)||(selectedSkill&&selectedSkill.sport===sp);
+    const box=document.createElement('div');box.className='sp'+(isOpen?' open':'');
+    const h=document.createElement('button');h.type='button';h.className='sp-h';h.setAttribute('aria-expanded',isOpen);
+    const nm=document.createElement('span');nm.textContent=ui(sp,SPA(sp));const cnt=document.createElement('span');cnt.className='n';cnt.textContent=list.length;const ch=document.createElement('span');ch.className='chev';ch.setAttribute('aria-hidden','true');
+    h.append(nm,cnt,ch);
+    const ul=document.createElement('div');ul.className='sp-list';
+    list.forEach(s=>{const b=document.createElement('button');b.type='button';b.textContent=lang==='ar'?s.ar:s.name;b.setAttribute('aria-pressed',selectedSkill?.id===s.id);b.onclick=()=>selectSkill(s.id);ul.append(b)});
+    h.onclick=()=>{const o=!box.classList.contains('open');box.classList.toggle('open',o);h.setAttribute('aria-expanded',o);o?openSports.add(sp):openSports.delete(sp)};
+    box.append(h,ul);skillResults.append(box)});
+  skillStatus.textContent=!q?ui(SKILLS.length+' skills in '+sports.length+' sports. Open a sport to pick a skill, or type to search.',SKILLS.length+' مهارة في '+sports.length+' رياضات. افتح رياضة لاختيار مهارة، أو اكتب للبحث.'):matches.length?ui(matches.length+' matching skill'+(matches.length===1?'':'s')+'. Choose one; Enter opens the first.',matches.length+' نتيجة. اختر مهارة؛ مفتاح الإدخال يفتح الأولى.'):ui('No matching skill. Try a sport name, an action, or Arabic.','لا توجد مهارة مطابقة. جرّب اسم رياضة أو حركة أو كلمة عربية.');
 }
+/* sidebar: tap the menu button to open or close */
+const sideEl=document.getElementById('side'),scrimEl=document.getElementById('scrim'),menuBtn=document.getElementById('menu');
+function setSide(open,focus){sideEl.classList.toggle('open',open);scrimEl.classList.toggle('on',open);menuBtn.setAttribute('aria-expanded',open);sideEl.inert=!open;
+  if(open&&focus&&!matchMedia('(pointer:coarse)').matches)skillQuery.focus();
+  if(!open&&focus)menuBtn.focus()}
+sideEl.inert=true;
+menuBtn.onclick=()=>setSide(!sideEl.classList.contains('open'),true);
+document.getElementById('sideClose').onclick=()=>setSide(false,true);
+scrimEl.onclick=()=>setSide(false,true);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&sideEl.classList.contains('open')&&!skillQuery.value){setSide(false,true)}});
 function selectSkill(id,refresh=true){
  selectedSkill=SKILLS.find(s=>s.id===id);sel=null;
  if(skel)document.getElementById('sk').click();
@@ -862,12 +1121,11 @@ const SOURCES=[
  ['Planes and axes: reference conventions','https://neilmaxwell.com/lesson/kinesiology/planes-and-axes-of-motion/']
 ];
 skillQuery.addEventListener('input',()=>renderResults());
-skillQuery.addEventListener('keydown',e=>{if(e.key==='Enter'){const s=matching()[0];if(s){e.preventDefault();selectSkill(s.id)}}if(e.key==='Escape')document.getElementById('clearSkill').click()});
+skillQuery.addEventListener('keydown',e=>{if(e.key==='Enter'){const s=matching()[0];if(s){e.preventDefault();selectSkill(s.id)}}if(e.key==='Escape'&&skillQuery.value)document.getElementById('clearSkill').click()});
 document.getElementById('clearSkill').onclick=()=>{selectedSkill=null;sel=null;skillQuery.value='';fig.classList.remove('skill-mode');cancelAnimationFrame(raf);setVB(home.slice());paint();renderResults(false);skillQuery.focus()};
 const oldSkeletonClick=document.getElementById('sk').onclick;
 document.getElementById('sk').onclick=()=>{if(!skel&&selectedSkill){selectedSkill=null;fig.classList.remove('skill-mode');skillQuery.value='';renderResults(false)}oldSkeletonClick()};
 updateSkillLabels();lbl();
 
-</script>
-</body>
-</html>
+
+})();</script></body></html>
